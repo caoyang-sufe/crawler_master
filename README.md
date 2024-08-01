@@ -1,4 +1,4 @@
-Add directory:
+First add directories:
 ```bash
 ./logging
 ./temp

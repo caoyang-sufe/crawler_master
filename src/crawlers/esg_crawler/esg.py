@@ -99,6 +99,8 @@ class ESGCrawler(BaseCrawler):
 			logging.info(f"Start at page {start_page}, currently at {current_page}")
 			assert start_page == current_page
 			while True:
+				current_page = self._easy_get_current_page_number(driver)	# Determine current page number
+				logging.info(f"Current Page: {current_page}")
 				# Parse table data
 				esg_dataframe = self._easy_parse_esg_table(driver, save_path=self.table_save_path)
 				# Parse detailed report content
