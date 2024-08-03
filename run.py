@@ -24,6 +24,7 @@ def easy_run():
 	parser.add_argument("--start_page", type=int)	# @param start_page of `run_esg_crawler`
 	parser.add_argument("--start_from", type=int)	# @param start_from of `run_esg_downloader`
 	parser.add_argument("--monitor_interval", type=int)	# @param watch_interval of `run_csdn_monitor`
+	parser.add_argument("--n_days_before", type=int)	# @param n_days_before of `run_csdn_displayer`
 	args = parser.parse_args()
 	kwargs = dict()
 	for key, word in args._get_kwargs():
@@ -69,7 +70,12 @@ def run_csdn_monitor(monitor_interval, **kwargs):
 						   monitor_interval = monitor_interval,
 						   )
 
-									
+def run_csdn_displayer(n_days_before, **kwargs):
+	csdn = CSDNCrawler()
+	csdn.display_watch_article_data(watch_article_ids = None,
+									columns = ["view_count"],
+									n_days_before = n_days_before,
+									)								
 
 if __name__ == "__main__":
 	easy_run()

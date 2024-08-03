@@ -6,12 +6,14 @@ import os
 import re
 import time
 import random
+import pandas
 import logging
 import requests
 from copy import deepcopy
 from bs4 import BeautifulSoup
 from urllib.parse import urlencode
 from urllib.request import urljoin
+from datetime import datetime, timedelta
 
 from src.crawlers.csdn import CRAWLER_NAME
 from src.crawlers.base import BaseCrawler
@@ -88,7 +90,8 @@ sec-ch-ua-platform: \"Windows\"""",
 						 "132438548", "129070965", "127975883",
 						 "126730213", "124877401", "117846179",
 						 ]	# Default `watch_article_ids`
-	read_article_ids = ["125490784"]	# Default `read_article_ids`
+	read_article_ids = [
+						]	# Default `read_article_ids`
 
 	def __init__(self,
 				 **kwargs,
@@ -100,8 +103,8 @@ sec-ch-ua-platform: \"Windows\"""",
 	# Monitor and increase the view-count of articles
 	# @param domain: High level CSDN users usually have DIY domain name, e.g. my domain name is "caoyang" and corresponding home page is "https://caoyang.blog.csdn.net"
 	# @param username: CSDN username, e.g. my username is "CY19980216" and the corresponding home page is "https://blog.csdn.net/CY19980216"
-	# @param watch_article_ids: Articles which are required to be watched to monitor the view-count
-	# @param read_article_ids: Articles which are required to be read to increase the view-count
+	# @param watch_article_ids: Articles which are required to be watched to monitor the view-count, default `self.watch_article_ids`
+	# @param read_article_ids: Articles which are required to be read to increase the view-count, default `self.read_article_ids`
 	# @param max_view_count: Max view-count of `read_article_ids`
 	# @param monitor_interval: Interval time between two loops
 	# @param kwargs: Other keyword arguments used to update `self.query_dict_of_api_business_list`
@@ -273,4 +276,31 @@ sec-ch-ua-platform: \"Windows\"""",
 					remain_interval = monitor_interval - consumed_interval
 					logging.info(f"Remain interval for {remain_interval} seconds ...")
 					time.sleep(remain_interval)
-	
+
+	# Display the monitor data of articles
+	# @param watch_article_ids: List of articleId which are required to be displayed, default `self.watch_article_ids`
+	# @param columns: List of columns which are required to be displayed, e.g "view_count", "comment_count", "digg_count", "collect_count"
+	# @param n_days_before: The number of days before to be displayed
+	def display_watch_article_data(self,
+								   watch_article_ids = None,
+								   columns = ["view_count"],
+								   n_days_before = 3,
+								   ):
+		if watch_article_ids is None:
+			watch_article_ids = self.watch_article_ids[:]
+		datetime_now = datetime.now()
+		datetime_n_days_before = datetime.now() - timedelta(days=n_days_before)
+		for watch_article_id in watch_article_ids:
+			logging.info(f"Display article {watch_article_id}")
+			file_path = os.path.join(self.monitor_save_dir, f"{watch_article_id}.txt")
+			dataframe = pandas.read_csv(file_path, sep='\t', header=0)
+			dataframe["datetime"] = pandas.to_datetime(dataframe["datetime"], format="%Y-%m-%d %H:%M:%S")
+			dataframe = dataframe[dataframe["datetime"] >= datetime_n_days_before]
+			for column in columns:
+				dataframe_slice = dataframe[[column, "datetime"]].drop_duplicates(subset=column, keep="first").reset_index(drop=True)
+				for i in range(dataframe_slice.shape[0]):
+					count = dataframe_slice.loc[i, column]
+					datetime_string = dataframe_slice.loc[i, "datetime"]
+					logging.info(f"    - {count} {datetime_string}")
+				logging.info('-' * 16)
+		
