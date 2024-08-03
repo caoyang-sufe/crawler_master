@@ -100,7 +100,7 @@ class ESGCrawler(BaseCrawler):
 				esg_dataframe = self._easy_parse_esg_table(driver, save_path = table_save_path)
 				# Parse detailed report content
 				logging.info("Fetch report links ...")
-				report_links = driver.find_elements_by_xpath(self.xpaths[f"report_link_{self.category}"])
+				report_links = driver.find_elements_by_xpath(self.xpaths[f"report_link_{category}"])
 				logging.info(f"  - Done! Totally {len(report_links)}")
 				for current_row, report_link in enumerate(report_links):
 					if current_page == start_page and current_row < start_row:
