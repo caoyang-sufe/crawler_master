@@ -88,16 +88,14 @@ sec-ch-ua-platform: \"Windows\"""",
 						 "132438548", "129070965", "127975883",
 						 "126730213", "124877401", "117846179",
 						 ]	# Default `watch_article_ids`
-	read_article_ids = []	# Default `read_article_ids`
+	read_article_ids = ["125490784"]	# Default `read_article_ids`
 
 	def __init__(self,
 				 **kwargs,
 				 ):
 		super(CSDNCrawler, self).__init__(**kwargs)
-		self.watch_save_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, "watch")	# Save the watched data
-		self.read_save_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, "read")	# Save the read data
-		os.makedirs(self.watch_save_dir, exist_ok=True)
-		os.makedirs(self.read_save_dir, exist_ok=True)
+		self.monitor_save_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, "monitor")	# Save the monitor data
+		os.makedirs(self.monitor_save_dir, exist_ok=True)
 
 	# Monitor and increase the view-count of articles
 	# @param domain: High level CSDN users usually have DIY domain name, e.g. my domain name is "caoyang" and corresponding home page is "https://caoyang.blog.csdn.net"
@@ -105,7 +103,7 @@ sec-ch-ua-platform: \"Windows\"""",
 	# @param watch_article_ids: Articles which are required to be watched to monitor the view-count
 	# @param read_article_ids: Articles which are required to be read to increase the view-count
 	# @param max_view_count: Max view-count of `read_article_ids`
-	# @param watch_interval: Interval time between two watches
+	# @param monitor_interval: Interval time between two loops
 	# @param kwargs: Other keyword arguments used to update `self.query_dict_of_api_business_list`
 	def monitor_user_data(self,
 						  domain = "caoyang",
@@ -113,7 +111,7 @@ sec-ch-ua-platform: \"Windows\"""",
 						  watch_article_ids = None,
 						  read_article_ids = None,
 						  max_view_count = 10000,
-						  watch_interval = 120,
+						  monitor_interval = 120,
 						  **kwargs,
 						  ):
 		running_timestamp = time.strftime("%Y%m%d%H%M%S")
@@ -133,14 +131,37 @@ sec-ch-ua-platform: \"Windows\"""",
 			if key in query_dict:
 				query_dict[key] = word
 		query_string = urlencode(query_dict)
+		logging.info(f"Query string: {query_string}")
 		url_business_list = urljoin(url_user, self.api_business_list + query_string)
 		logging.info(f"`url_business_list`: {url_business_list}")
 		headers_business_list = BaseCrawler.headers_to_dict(headers=self.headers["business_list"])
 		headers_article = BaseCrawler.headers_to_dict(headers=self.headers["article"])
 		headers_profile = BaseCrawler.headers_to_dict(headers=self.headers["profile"])
 		while True:
+			monitor_start_time = time.time()
 			# ---------------------------------------------------------
-			# Step 1: Watch the statistics number of each article
+			# Step 1: Read each article to increase read-count
+			# ---------------------------------------------------------
+			if read_article_ids:	
+				for i, read_article_id in enumerate(read_article_ids):
+					logging.info(f"Reading article {read_article_id} ...")
+					response = self.easy_requests(method = "GET",
+												  url = url_formatter_article(article_id = read_article_id),
+												  max_trial = 5,
+												  headers = headers_article,
+												  timeout = 30,
+												  )
+					if response is None:
+						logging.warning(f"  - Fail to read article {read_article_id}!")
+					else:
+						logging.info(f"  - Successfully read article {read_article_id}!")	
+						soup = BeautifulSoup(response.text, "lxml")
+						read_count_span = soup.find("span", class_="read-count")
+						read_count_string = str(read_count_span.string)
+						read_count = int(self.regexes["number"].findall(read_count_string)[0])
+						logging.info(f"  - Read count: {read_count}")
+			# ---------------------------------------------------------
+			# Step 2: Watch the statistics number of each article
 			# ---------------------------------------------------------
 			if watch_article_ids:
 				while True:
@@ -151,7 +172,6 @@ sec-ch-ua-platform: \"Windows\"""",
 												  headers = headers_business_list,
 												  timeout = 30,
 												  )
-					datetime_string = time.strftime("%Y-%m-%d %H:%M:%S")
 					json_response = response.json()
 					try:
 						# 2024/08/03 01:44:57
@@ -190,12 +210,13 @@ sec-ch-ua-platform: \"Windows\"""",
 												 "collect_count": collect_count,
 												 }
 				# Check the statistics of each `watch_article_id`
+				datetime_string = time.strftime("%Y-%m-%d %H:%M:%S")
 				for watch_article_id in watch_article_ids:
 					if watch_article_id in business_dict:
 						logging.info(f"{watch_article_id} can be watched!")
 						keys = list(business_dict[watch_article_id].keys())
 						values = list(business_dict[watch_article_id].values())
-						save_path = os.path.join(self.watch_save_dir, f"{watch_article_id}.txt")
+						save_path = os.path.join(self.monitor_save_dir, f"{watch_article_id}.txt")
 						if not os.path.exists(save_path):
 							with open(save_path, 'w', encoding="utf8") as f:
 								f.write('\t'.join(keys) + "\tdatetime\n")
@@ -203,29 +224,10 @@ sec-ch-ua-platform: \"Windows\"""",
 							f.write('\t'.join(map(str, values)) + f"\t{datetime_string}\n")
 					else:
 						logging.info(f"{watch_article_id} cannot be watched!")
-			# ---------------------------------------------------------
-			# Step 2: Read each article to increase read-count
-			# ---------------------------------------------------------
-			if read_article_ids:	
-				save_path = os.path.join(self.read_save_dir, f"read_count_{running_timestamp}.txt")
-				with open(save_path, 'w', encoding="utf8") as f:
-					f.write('\t'.join(read_article_ids) + '\n')
-				read_counts = list()
-				for i, read_article_id in enumerate(read_article_ids):
-					response = self.easy_requests(method = "GET",
-												  url = url_formatter_article(article_id = read_article_id),
-												  max_trial = -1,
-												  headers = headers_article,
-												  timeout = 30,
-												  )
-					soup = BeautifulSoup(response.text, "lxml")
-					read_count_span = soup.find("span", class_="read-count")
-					read_count_string = str(read_count_span.string)
-					read_count = int(self.regexes["number"].findall(read_count_string)[0])
-					read_counts.append(read_count)	
-
-				# Display other blog data
-				
+				# ---------------------------------------------------------
+				# Step 3: Watch the statistics number of user profile
+				# ---------------------------------------------------------
+				statistics_numbers = list()
 				while True:
 					response = self.easy_requests(method = "GET",
 												  url = url_user,
@@ -233,44 +235,42 @@ sec-ch-ua-platform: \"Windows\"""",
 												  headers = headers_profile,
 												  timeout = 30,
 												  )
-					datetime_string = time.strftime("%Y-%m-%d %H:%M:%S")
+					
 					html = response.text
 					soup = BeautifulSoup(html, "lxml")
-					user_profile_div = soup.find("div", attrs={"class": "user-profile-head-info-r-c"})
+					user_profile_div = soup.find("div", class_="user-profile-head-info-r-c")	# Statistics number area 1
+					achievement_box_ul = soup.find("ul", class_="aside-common-box-achievement")	# Statistics number area 1
 					if user_profile_div is None:
 						logging.warning("User profile is None!")
 						logging.info(f"Waiting for {self.reset_interval} seconds ...")
 						time.sleep(self.reset_interval)
-					else:
-						logging.info("Successfully find user profile!")
+					elif achievement_box_ul is None:
+						logging.warning("Achievement box is None!")
+						logging.info(f"Waiting for {self.reset_interval} seconds ...")
+						time.sleep(self.reset_interval)
+					else:						
+						logging.info("Successfully find user profile and achievement box!")
+						
 						break
-				for li in user_profile_div.find_all("li"):
-					try:
-						statistics_number = int(str(li.find("div", attrs={"class": "user-profile-statistics-num"}).string).replace(',', ''))
-						print(statistics_number, end=',')
-					except Exception as exception:
-						continue
-					
-				ul = soup.find("ul", attrs={"class": "aside-common-box-achievement"})
-				for span in ul.find_all("span"):
-					achievement_number = int(str(span.string).replace(',', ''))
-					print(achievement_number, end=',')
-				print(datetime_string)
-				read_end_time = time.time()
-				consumed_time = read_end_time - read_start_time
-				if consumed_time < watch_interval:
-					real_interval = watch_interval - consumed_time
-					logging.info(f"Real watch interval for {real_interval} seconds ...")
-					time.sleep(real_interval)
+				_tag_to_number = lambda _tag: int(str(_tag.string).replace(',', str()))
+				statistics_number_divs = user_profile_div.find_all("div", class_="user-profile-statistics-num")
+				achievement_number_spans = achievement_box_ul.find_all("span")
+				statistics_numbers += map(_tag_to_number, statistics_number_divs)
+				statistics_numbers += map(_tag_to_number, achievement_number_spans)
+				datetime_string = time.strftime("%Y-%m-%d %H:%M:%S")
+				save_path = os.path.join(self.monitor_save_dir, f"{username}.txt")
+				if not os.path.exists(save_path):
+					with open(save_path, 'w', encoding="utf8") as f:
+						f.write("statistics\tdatetime\n")
+				with open(save_path, 'a', encoding="utf8") as f:
+					f.write(','.join(map(str, statistics_numbers)) + f"\t{datetime_string}\n")
+				# ---------------------------------------------------------
+				# Step 4: Interval
+				# ---------------------------------------------------------
+				monitor_end_time = time.time()
+				consumed_interval = monitor_end_time - monitor_start_time
+				if consumed_interval < monitor_interval:
+					remain_interval = monitor_interval - consumed_interval
+					logging.info(f"Remain interval for {remain_interval} seconds ...")
+					time.sleep(remain_interval)
 	
-
-	def display_(self,
-				 watch_article_ids,
-				 n_days_before = 3,
-				 ):
-		pass
-
-
-	def _easy_watch_articles():
-		pass
-		
