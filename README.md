@@ -9,3 +9,9 @@ Parsed data will be downloaded at
 ```
 
 # CSDN
+
+Monitor data will be saved at
+
+```bash
+./data/crawler/csdn/monitor
+```
