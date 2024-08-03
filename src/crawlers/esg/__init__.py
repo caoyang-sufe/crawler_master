@@ -2,5 +2,5 @@
 # @author: caoyang
 # @email: caoyang@stu.sufe.edu.cn
 
-CRAWLER_NAME = "esg_crawler"
+CRAWLER_NAME = "esg"
 

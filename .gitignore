@@ -1,0 +1,5 @@
+*.pyc
+data/
+logging/
+temp/
+__pycache__/

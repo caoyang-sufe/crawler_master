@@ -2,12 +2,26 @@
 # @author: caoyang
 # @email: caoyang@stu.sufe.edu.cn
 
-fp = "./logging/esg_20240726234759.log"
+import sys
+import argparse
 
-with open(fp, 'r', encoding="utf8") as f:
-	line = -1
-	while True:
-		line += 1
-		print(line, f.readline()[:-1])
-		if line % 10 == 9:
-			input()
+def f(a, **kwargs):
+	print(a)
+	print(kwargs)
+
+
+
+
+if __name__ == "__main__":
+	# parser = argparse.ArgumentParser("--")
+	# parser.add_argument("--category", type=str)
+	# args = parser.parse_args()
+	# print(args._get_kwargs())
+	# print(dir(args))
+	# for k, v in args:
+		# print(k, v)
+	# print(sys.argv)
+
+	params = {"a": 1, "b": 2}
+	f(**params)
+	

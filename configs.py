@@ -11,9 +11,9 @@ class BaseConfig:
 						default = r"C:\Users\caoyang\AppData\Local\Google\Chrome\User Data",
 						type = str,
 						)
-	
-
 
 class ESGConfig:
 	parser = deepcopy(BaseConfig)
-	
+
+class CSDNConfig:
+	parser = deepcopy(BaseConfig)

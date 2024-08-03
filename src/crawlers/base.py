@@ -15,9 +15,10 @@ from src.base import BaseClass
 class BaseCrawler(BaseClass):
 	reset_interval = 300
 	click_interval = 3
-	chrome_user_data_path = r"C:\Users\caoyang\AppData\Local\Google\Chrome\User Data"
+	chrome_user_data_path = r"C:\Users\lzwcy\AppData\Local\Google\Chrome\User Data"
 	regexes = {"html_tag": re.compile(r"<[^>]+>|\n|\t"),	# Remove HTML tags, including '\t' and '\n'
-			   "forbidden_filename_char": re.compile(r"\\|/|:|\?|\*|\"|<|>|\|"),
+			   "forbidden_filename_char": re.compile(r"\\|/|:|\?|\*|\"|<|>|\|"),	# Characters which are forbidden in filename (on WINDOWS system)
+			   "number": re.compile(r"\d+"),
 			   }
 	javascript = {"scroll_into_view": "arguments[0].scrollIntoView(true);",
 				  "scroll_into_view_center": "arguments[0].scrollIntoView({behavior: \"instant\", block: \"center\", inline: \"center\"});",
@@ -27,6 +28,7 @@ class BaseCrawler(BaseClass):
 		super(BaseCrawler, self).__init__(**kwargs)
 	
 	# Convert request headers copied from Firefox to dictionary
+	# @param headers: Headers string
 	@classmethod
 	def headers_to_dict(cls, headers: str) -> dict:
 		lines = headers.splitlines()
@@ -37,13 +39,22 @@ class BaseCrawler(BaseClass):
 		return headers_dict
 
 	# Easy use of WebDriverWait
+	# @param driver: Browser driver
+	# @param xpath: XPath of the checked element
+	# @param timeout: Timeout of `WebDriverWait`
 	@classmethod
-	def check_element_by_xpath(cls, driver, xpath, timeout=30):
+	def check_element_by_xpath(cls,
+							   driver,
+							   xpath,
+							   timeout = 30,
+							   ):
 		logging.info(f"Check XPath: {xpath}")
 		WebDriverWait(driver, timeout).until(lambda _driver: _driver.find_element_by_xpath(xpath).is_displayed())
 		logging.info(f"XPath {xpath} is visible!")
 	
 	# @param method: e.g. GET, POST
+	# @param url: Requested URL
+	# @param max_trial: Max request times
 	def easy_requests(self, 
 					  method, 
 					  url, 
@@ -66,10 +77,14 @@ class BaseCrawler(BaseClass):
 		return response
 
 	# Initialize driver
+	# @param driver: Browser driver
+	# @param headless: Whether to use headless driver
+	# @param timeout: Global driver timeout
+	# @return: Browser driver
 	def initialize_driver(self, 
-						  browser="chrome", 
-						  headless=True, 
-						  timeout=60, 
+						  browser = "chrome", 
+						  headless = True, 
+						  timeout = 60, 
 						  **kwargs,
 						  ):
 		browser = browser.lower()
@@ -108,10 +123,14 @@ class BaseCrawler(BaseClass):
 		return driver
 
 	# Get cookies by driver
+	# @param url: Target URL
+	# @param driver: Browser driver
+	# @param browser: Browser name, e.g. "chrome", "firefox"
+	# @return: Cookie string
 	def get_cookies(self, 
 					url, 
-					driver=None, 
-					browser="chrome",
+					driver = None, 
+					browser = "chrome",
 					):
 		quit_flag = False
 		if driver is None:

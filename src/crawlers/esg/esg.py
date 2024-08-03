@@ -4,37 +4,33 @@
 
 import os
 import time
-import json
 import random
 import pandas
 import logging
-import requests
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
+from urllib.request import urljoin
 from selenium.webdriver.common.action_chains import ActionChains
 
-from src.crawlers.esg_crawler import CRAWLER_NAME
+from src.crawlers.esg import CRAWLER_NAME
 from src.crawlers.base import BaseCrawler
 
 from settings import CRAWLER_DATA_DIR, TEMP_DIR
 
 class ESGCrawler(BaseCrawler):
-	url_host = "https://i-esg.com/"
-	url_esg_report = url_host + "esg/esgReport"
-	url_esg_event = url_host + "esgEvent/event/ag"
-	url_esg_penalty = url_host + "environmentCredit/environmentPenalties"
+	url_host = "https://i-esg.com"
+	url_esg_summary = {"report": urljoin(url_host, "/esg/esgReport"),
+					   "event": urljoin(url_host, "/esgEvent/event/ag"),
+					   "penalty": urljoin(url_host, "/environmentCredit/environmentPenalties")
+					   }
 	jump_size = 5
 	click_interval = 2
 	max_trial = 5
 	xpaths = {
 		"table_header": "//table[@class=\"vxe-table--header\"]",	# <table> which contains the table header
 		"table_body": "//table[@class=\"vxe-table--body\"]",		# <table> which contains the table body
-		
-		"report_link_report": "//a[@class=\"line-clamp-1\"]",
-		"report_link_penalty": "//table[@class=\"vxe-table--body\"]//td[not(contains(@class, \"fixed--hidden\"))]//a[@class=\"line-clamp-1\"]",	# There are two tables matching XPATH `//table[@class=\"vxe-table--body\"]` on the page
-		"report_link_event": "//tr/td[3]//a",	# <a> which links to the report (may be in form of PDF, WORD, HTML, ZIP packages)
-
+		"report_link_report": "//a[@class=\"line-clamp-1\"]",	# <a> which links to the report of report (may be in form of PDF, WORD, HTML, ZIP packages)
+		"report_link_penalty": "//table[@class=\"vxe-table--body\"]//td[not(contains(@class, \"fixed--hidden\"))]//a[@class=\"line-clamp-1\"]",	# Note: There are two tables matching XPATH `//table[@class=\"vxe-table--body\"]` on the page
+		"report_link_event": "//tr/td[3]//a",	# <a> which links to the report of event (may be in form of PDF, WORD, HTML, ZIP packages)
 		"next_page_button": "//button[@class=\"vxe-pager--next-btn\"]",	# <button> which is clicked to next page
 		"last_page_button": "//button[@class=\"vxe-pager--prev-btn\"]",	# <button> which is clicked to last page
 		"jump_right_button": "//button[@class=\"vxe-pager--jump-next\"]",	# <button> which is clicked to jump 5 pages behind
@@ -50,44 +46,43 @@ class ESGCrawler(BaseCrawler):
 		"alert_button": "//cr-button[@class=\"action-button\"]",	# <cr-button> which is clicked to reload the page in alert box
 		"close_span": "//div[@class=\"vc-tabs__item is-top is-active is-closable\"]//span[@class=\"is-icon-close\"]",	# <span> which is clicked to close the active tab
 		"content_div": "//div[@class=\"zlibDetailWrapper\"]",	# <div> which contains the content of the report which is not PDF. You can directly fetch the text on the active tab
-
 	}
 
 	def __init__(self, 
-				 category, # "report", "event", "penalty"
 				 **kwargs,
 				 ):
 		super(ESGCrawler, self).__init__(**kwargs)
-		self.category = category
-		self.url_esg = eval(f"self.url_esg_{category}")
-		self.iframe_save_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, category, "iframe")	# PDF, WORD
-		self.html_save_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, category, "html")	# HTML
-		os.makedirs(self.iframe_save_dir, exist_ok=True)
-		os.makedirs(self.html_save_dir, exist_ok=True)
-		self.detail_save_path = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, category, "detail.txt")	# Save the return of `_easy_parse_report_link`
-		self.table_save_path = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, category, "table.txt")	# Save the return of `_easy_parse_esg_table`
-	
+
 	# Unified function to parse tables over several pages
-	# @param url: Table URL
-	# @param report_link_xpath: XPATH of the report links to detail pages, i.e. `self.xpaths["report_link"]`
+	# @param category: Key of `self.url_esg_summary`, e.g. "report", "event", "penalty"
 	# @param start_page: Page which starts at
 	# @param start_row: Page which starts at
 	# @param browser: Browser name, e.g. "chrome", "firefox"
 	# @param headless: Whether to use headless driver
 	# @param timeout: Browser driver timeout
 	def parse_tables_over_pages(self,
+								category,
 								start_page = 1,
 								start_row = 0,
 								browser = "chrome",
 								headless = False,
 								timeout = 60,
 								):
+		# Global definition
+		url_esg = self.url_esg_summary[category]
+		iframe_save_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, category, "iframe")	# PDF, WORD
+		html_save_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, category, "html")	# HTML
+		os.makedirs(iframe_save_dir, exist_ok=True)
+		os.makedirs(html_save_dir, exist_ok=True)
+		detail_save_path = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, category, "detail.txt")	# Save the return of `_easy_parse_report_link`
+		table_save_path = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, category, "table.txt")	# Save the return of `_easy_parse_esg_table`
+		# Start chrome driver
 		driver = self.initialize_driver(browser = browser,
 										headless = headless,
 										timeout = timeout,
-										)	# Start chrome driver
+										)
 		try:
-			driver.get(self.url_esg)	# Visit the first page
+			driver.get(url_esg)	# Visit the first page
 			BaseCrawler.check_element_by_xpath(driver, xpath=self.xpaths["table_body"])	# Check if table is loaded
 			current_page = self._easy_get_current_page_number(driver)	# Determine current page number
 			current_page = self._easy_skip_to_target_page(driver,
@@ -102,7 +97,7 @@ class ESGCrawler(BaseCrawler):
 				current_page = self._easy_get_current_page_number(driver)	# Determine current page number
 				logging.info(f"Current Page: {current_page}")
 				# Parse table data
-				esg_dataframe = self._easy_parse_esg_table(driver, save_path=self.table_save_path)
+				esg_dataframe = self._easy_parse_esg_table(driver, save_path = table_save_path)
 				# Parse detailed report content
 				logging.info("Fetch report links ...")
 				report_links = driver.find_elements_by_xpath(self.xpaths[f"report_link_{self.category}"])
@@ -112,8 +107,8 @@ class ESGCrawler(BaseCrawler):
 						continue
 					parsed_results = self._easy_parse_report_link(driver, report_link)
 					self._easy_save_detail_results(parsed_results,
-												   detail_save_path = self.detail_save_path,
-												   html_save_dir = self.html_save_dir,
+												   detail_save_path,
+												   html_save_dir,
 												   )
 				self._easy_turn_over_page_and_scroll_back(driver,
 														  click_interval = self.click_interval,
@@ -126,15 +121,17 @@ class ESGCrawler(BaseCrawler):
 			return current_page
 		driver.quit()
 		
-	# Download reports according to `self.detail_save_path`
-	# @param detail_save_path: `self.detail_save_path`
+	# Download reports according to `detail_save_path`
+	# @param category: Key of `self.url_esg_summary`, e.g. "report", "event", "penalty"
+	# @param start_from: Index number of `detail_save_path` which is started from
 	# @param download_interval: Expected interval between two downloads
-	# @param start_from: Row number of `self.detail_save_path` which is started from
 	def download_reports(self,
-						 detail_save_path,
-						 download_interval,
+						 category,
 						 start_from = 0,
+						 download_interval = 15,
 						 ):
+		iframe_save_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, category, "iframe")
+		detail_save_path = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, category, "detail.txt")
 		interval_lower = download_interval // 2
 		interval_upper = download_interval // 2 * 3
 		dataframe_detail = pandas.read_csv(detail_save_path, sep='\t', header=0, dtype=str, encoding="utf8")
@@ -146,7 +143,7 @@ class ESGCrawler(BaseCrawler):
 			error = dataframe_detail.loc[i, "error"]
 			logging.info(f"Download reports: {title}")
 			if download_url:
-				self._easy_download_report(download_url, save_path = None)
+				self._easy_download_iframe(download_url, iframe_save_dir)
 				time.sleep(random.randint(interval_lower, interval_upper))
 			else:
 				if text:
@@ -249,7 +246,7 @@ class ESGCrawler(BaseCrawler):
 
 	# Parse all the data list in the table on one page
 	# @param driver: Browser driver
-	# @param save_path: Table DataFrame save path, i.e. `self.table_save_path`
+	# @param save_path: Table DataFrame save path, i.e. `table_save_path`
 	# @return esg_dataframe: Full table data transferred to DataFrame
 	def _easy_parse_esg_table(self, 
 							  driver,
@@ -385,8 +382,8 @@ class ESGCrawler(BaseCrawler):
 	
 	# Save the parsed detailed content, i.e. the returned results of `_easy_parse_report_link`
 	# @param parsed_results: The return of `_easy_parse_report_link`
-	# @param detail_save_path: Refer to `self.detail_save_path`
-	# @param html_save_dir: Refer to `self.html_save_dir`
+	# @param detail_save_path: Save path of `parsed_results`
+	# @param html_save_dir: Directory to save HTML text
 	def _easy_save_detail_results(self, 
 								  parsed_results,
 								  detail_save_path,
@@ -442,23 +439,25 @@ class ESGCrawler(BaseCrawler):
 		
 	# Download PDF or WORD report by parsed URL
 	# @param download_url: The return of `self._easy_parse_report_link`
-	# @param save_path: Report save path, default at `self.iframe_save_dir`
-	def _easy_download_report(self, 
+	# @param iframe_save_dir: Save directory of PDF, WORD reports
+	def _easy_download_iframe(self, 
 							  download_url,
-							  save_path = None,
+							  iframe_save_dir,
 							  ):
 		def _easy_deal_with_url(_url):
 			_index = _url.find("?src=http")
 			return _url if _index == -1 else _url[_index + 5: ]
 		
 		download_url = _easy_deal_with_url(download_url)
-		response = self.easy_requests(method = "GET", url = download_url)
+		response = self.easy_requests(method = "GET",
+									  url = download_url,
+									  max_trial = 5,
+									  )
 		if response is None:
 			logging.info(f"Fail to download from {download_url}")
 			return
-		if save_path is None:
-			filename = download_url.split('/')[-1]
-			save_path = os.path.join(self.iframe_save_dir, filename)
+		filename = download_url.split('/')[-1]
+		save_path = os.path.join(iframe_save_dir, filename)
 		logging.info(f"Save at {save_path}")
 		with open(save_path, "wb") as f:
 			f.write(response.content)
