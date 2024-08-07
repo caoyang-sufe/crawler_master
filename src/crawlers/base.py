@@ -69,11 +69,11 @@ class BaseCrawler(BaseClass):
 			except Exception as e:
 				count += 1
 				logging.warning(f"Error {method} {url}, exception information: {e}")
-				logging.warning(f"Wait for {self.global_interval} seconds ...")
+				logging.warning(f"Wait for {self.reset_interval} seconds ...")
 				if count == max_trial:
 					logging.warning(f"Exceed max trial times: {max_trial}")
 					return
-				time.sleep(self.global_interval)
+				time.sleep(self.reset_interval)
 		return response
 
 	# Initialize driver
