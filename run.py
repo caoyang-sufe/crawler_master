@@ -7,7 +7,7 @@ import sys
 import time
 import argparse
 
-from src.crawlers import ESGCrawler, CSDNCrawler, SanguoshaCrawler
+from src.crawlers import ESGCrawler, CSDNCrawler, ACLAnthologyCrawler
 from src.tools.easy import initialize_logger, terminate_logger
 
 from settings import CRAWLER_DATA_DIR, LOGGING_DIR, TEMP_DIR
