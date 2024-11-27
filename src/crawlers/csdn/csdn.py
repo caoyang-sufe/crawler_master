@@ -84,7 +84,9 @@ sec-ch-ua: "Not)A;Brand";v="99", "Google Chrome";v="127", "Chromium";v="127"
 sec-ch-ua-mobile: ?0
 sec-ch-ua-platform: \"Windows\"""",
 	}
-	watch_article_ids = ["140595950", "139551143", "138088546",
+	watch_article_ids = ["143869819", "143350101", "143310248", "142441347",
+						 "135325071", "141369623",
+						 "140595950", "139551143", "138088546",
 						 "137213986", "136645892", "136088465",
 						 "135319365", "134483304", "133832711",
 						 "132438548", "129070965", "127975883",
@@ -199,15 +201,18 @@ sec-ch-ua-platform: \"Windows\"""",
 						logging.warning(f"Error in processing business list: {exception}")
 						logging.info(f"Wait for {self.reset_interval} seconds ...")
 						time.sleep(self.reset_interval)
-				# Index `business_list` by `article_id`
-				business_dict = dict()
+				business_dict = dict()	# Index `business_list` by `article_id`
 				for data in business_list:
 					article_id = str(data["articleId"])
+					title = data["title"]
+					description = data["description"]
 					view_count = data["viewCount"]
 					comment_count = data["commentCount"]
 					digg_count = data["diggCount"]
 					collect_count = data["collectCount"]
-					business_dict[article_id] = {"view_count": view_count,
+					business_dict[article_id] = {"title": title,
+												 "description": description,
+												 "view_count": view_count,
 												 "comment_count": comment_count,
 												 "digg_count": digg_count,
 												 "collect_count": collect_count,
@@ -221,12 +226,13 @@ sec-ch-ua-platform: \"Windows\"""",
 						values = list(business_dict[watch_article_id].values())
 						save_path = os.path.join(self.monitor_save_dir, f"{watch_article_id}.txt")
 						if not os.path.exists(save_path):
+							# Create file and write table headers
 							with open(save_path, 'w', encoding="utf8") as f:
 								f.write('\t'.join(keys) + "\tdatetime\n")
 						with open(save_path, 'a', encoding="utf8") as f:
 							f.write('\t'.join(map(str, values)) + f"\t{datetime_string}\n")
 					else:
-						logging.info(f"{watch_article_id} cannot be watched!")
+						logging.info(f"{watch_article_id} cannot be watched!")				
 				# ---------------------------------------------------------
 				# Step 3: Watch the statistics number of user profile
 				# ---------------------------------------------------------
@@ -279,7 +285,7 @@ sec-ch-ua-platform: \"Windows\"""",
 
 	# Display the monitor data of articles
 	# @param watch_article_ids: List of articleId which are required to be displayed, default `self.watch_article_ids`
-	# @param columns: List of columns which are required to be displayed, e.g "view_count", "comment_count", "digg_count", "collect_count"
+	# @param columns: List of columns which are required to be displayed, e.g. "title", "description", "view_count", "comment_count", "digg_count", "collect_count"
 	# @param n_days_before: The number of days before to be displayed
 	def display_watch_article_data(self,
 								   watch_article_ids = None,
@@ -291,16 +297,21 @@ sec-ch-ua-platform: \"Windows\"""",
 		datetime_now = datetime.now()
 		datetime_n_days_before = datetime.now() - timedelta(days=n_days_before)
 		for watch_article_id in watch_article_ids:
-			logging.info(f"Display article {watch_article_id}")
+			
 			file_path = os.path.join(self.monitor_save_dir, f"{watch_article_id}.txt")
 			dataframe = pandas.read_csv(file_path, sep='\t', header=0)
 			dataframe["datetime"] = pandas.to_datetime(dataframe["datetime"], format="%Y-%m-%d %H:%M:%S")
 			dataframe = dataframe[dataframe["datetime"] >= datetime_n_days_before]
+			latest_title = dataframe.loc[dataframe.shape[0] - 1, "title"]
+			logging.info(f"Display article {watch_article_id}: {latest_title}")
 			for column in columns:
 				dataframe_slice = dataframe[[column, "datetime"]].drop_duplicates(subset=column, keep="first").reset_index(drop=True)
-				for i in range(dataframe_slice.shape[0]):
-					count = dataframe_slice.loc[i, column]
-					datetime_string = dataframe_slice.loc[i, "datetime"]
-					logging.info(f"    - {count} {datetime_string}")
+				if dataframe_slice.shape[0] > 1:
+					for i in range(1, dataframe_slice.shape[0]):
+						count = dataframe_slice.loc[i, column]
+						datetime_string = dataframe_slice.loc[i, "datetime"]
+						logging.info(f"    - {count} {datetime_string}")
+				else:
+					logging.info(f"    - Current `{column}` is {dataframe_slice.loc[0, column]}, no evidence inspected since {dataframe_slice.loc[0, 'datetime']}!")
 				logging.info('-' * 16)
 		

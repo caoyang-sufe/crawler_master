@@ -7,7 +7,7 @@ import sys
 import time
 import argparse
 
-from src.crawlers import ESGCrawler, CSDNCrawler
+from src.crawlers import ESGCrawler, CSDNCrawler, SanguoshaCrawler
 from src.tools.easy import initialize_logger, terminate_logger
 
 from settings import CRAWLER_DATA_DIR, LOGGING_DIR, TEMP_DIR
@@ -77,5 +77,11 @@ def run_csdn_displayer(n_days_before, **kwargs):
 									n_days_before = n_days_before,
 									)								
 
+def run_sanguosha_monitor():
+	sanguosha = SanguoshaCrawler()
+	sanguosha.run()
+
+
 if __name__ == "__main__":
-	easy_run()
+	# easy_run()	# bash script trigger
+	run_sanguosha_monitor()

@@ -15,7 +15,7 @@ from src.base import BaseClass
 class BaseCrawler(BaseClass):
 	reset_interval = 300
 	click_interval = 3
-	chrome_user_data_path = r"C:\Users\lzwcy\AppData\Local\Google\Chrome\User Data"
+	chrome_user_data_path = r"C:\Users\caoyang\AppData\Local\Google\Chrome\User Data"
 	regexes = {"html_tag": re.compile(r"<[^>]+>|\n|\t"),	# Remove HTML tags, including '\t' and '\n'
 			   "forbidden_filename_char": re.compile(r"\\|/|:|\?|\*|\"|<|>|\|"),	# Characters which are forbidden in filename (on WINDOWS system)
 			   "number": re.compile(r"\d+"),
