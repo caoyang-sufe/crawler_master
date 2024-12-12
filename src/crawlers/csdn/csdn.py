@@ -84,8 +84,8 @@ sec-ch-ua: "Not)A;Brand";v="99", "Google Chrome";v="127", "Chromium";v="127"
 sec-ch-ua-mobile: ?0
 sec-ch-ua-platform: \"Windows\"""",
 	}
-	watch_article_ids = ["143869819", "143350101", "143310248", "142441347",
-						 "135325071", "141369623",
+	watch_article_ids = ["143869819", "143350101", "143310248", 
+						 "142441347", "135325071", "141369623",
 						 "140595950", "139551143", "138088546",
 						 "137213986", "136645892", "136088465",
 						 "135319365", "134483304", "133832711",
@@ -119,6 +119,12 @@ sec-ch-ua-platform: \"Windows\"""",
 						  monitor_interval = 120,
 						  **kwargs,
 						  ):
+		def _tag_to_number(_tag):
+			_tag_string = str(_tag.string).replace(',', str())
+			if _tag_string.isdecimal():
+				return int(_tag_string)
+			else:
+				return -1
 		running_timestamp = time.strftime("%Y%m%d%H%M%S")
 		if watch_article_ids is None:
 			watch_article_ids = self.watch_article_ids[:]
@@ -261,7 +267,6 @@ sec-ch-ua-platform: \"Windows\"""",
 						logging.info("Successfully find user profile and achievement box!")
 						
 						break
-				_tag_to_number = lambda _tag: int(str(_tag.string).replace(',', str()))
 				statistics_number_divs = user_profile_div.find_all("div", class_="user-profile-statistics-num")
 				achievement_number_spans = achievement_box_ul.find_all("span")
 				statistics_numbers += map(_tag_to_number, statistics_number_divs)
@@ -296,8 +301,9 @@ sec-ch-ua-platform: \"Windows\"""",
 			watch_article_ids = self.watch_article_ids[:]
 		datetime_now = datetime.now()
 		datetime_n_days_before = datetime.now() - timedelta(days=n_days_before)
+		dataframe_slices = {column: list() for column in columns}
+		# Display by different article and datetime
 		for watch_article_id in watch_article_ids:
-			
 			file_path = os.path.join(self.monitor_save_dir, f"{watch_article_id}.txt")
 			dataframe = pandas.read_csv(file_path, sep='\t', header=0)
 			dataframe["datetime"] = pandas.to_datetime(dataframe["datetime"], format="%Y-%m-%d %H:%M:%S")
@@ -305,7 +311,8 @@ sec-ch-ua-platform: \"Windows\"""",
 			latest_title = dataframe.loc[dataframe.shape[0] - 1, "title"]
 			logging.info(f"Display article {watch_article_id}: {latest_title}")
 			for column in columns:
-				dataframe_slice = dataframe[[column, "datetime"]].drop_duplicates(subset=column, keep="first").reset_index(drop=True)
+				dataframe_slice = dataframe[[column, "datetime", "title"]].drop_duplicates(subset=column, keep="first").reset_index(drop=True)
+				dataframe_slices[column].append(dataframe_slice)
 				if dataframe_slice.shape[0] > 1:
 					for i in range(1, dataframe_slice.shape[0]):
 						count = dataframe_slice.loc[i, column]
@@ -314,4 +321,15 @@ sec-ch-ua-platform: \"Windows\"""",
 				else:
 					logging.info(f"    - Current `{column}` is {dataframe_slice.loc[0, column]}, no evidence inspected since {dataframe_slice.loc[0, 'datetime']}!")
 				logging.info('-' * 16)
+		logging.info('#' * 16)
+		# Display by datetime only
+		for column in columns:
+			combined_dataframe_slices = pandas.concat(dataframe_slices[column], axis=0).sort_values(by="datetime", ascending=True).reset_index(drop=True)
+			for i in range(combined_dataframe_slices.shape[0]):
+				title = combined_dataframe_slices.loc[i, "title"]
+				count = combined_dataframe_slices.loc[i, column]
+				datetime_string = combined_dataframe_slices.loc[i, "datetime"]
+				logging.info(f"    - {title} {count} {datetime_string}")
+		
+		
 		

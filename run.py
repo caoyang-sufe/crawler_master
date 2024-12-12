@@ -75,13 +75,17 @@ def run_csdn_displayer(n_days_before, **kwargs):
 	csdn.display_watch_article_data(watch_article_ids = None,
 									columns = ["view_count"],
 									n_days_before = n_days_before,
-									)								
+									)
+def run_aclanthology(**kwargs):
+	aclanthology = ACLAnthologyCrawler()
 
-def run_sanguosha_monitor():
-	sanguosha = SanguoshaCrawler()
-	sanguosha.run()
-
+	root = r"D:\code\python\project\caoyang\project_014_mrc\reference\conference"
+	for root, dirnames, filenames in os.walk(root):
+		for filename in filenames:
+			if filename.endswith(".pdf"):
+				paper_id = filename[: -4]
+				aclanthology.parse_paper_detail(paper_id, save_dir = os.path.join(CRAWLER_DATA_DIR, "aclanthology"))					
 
 if __name__ == "__main__":
 	# easy_run()	# bash script trigger
-	run_sanguosha_monitor()
+	run_aclanthology()
