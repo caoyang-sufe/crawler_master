@@ -3,4 +3,3 @@
 # @email: caoyang@stu.sufe.edu.cn
 
 CRAWLER_NAME = "esg"
-

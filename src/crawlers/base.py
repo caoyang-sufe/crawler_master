@@ -18,7 +18,8 @@ class BaseCrawler(BaseClass):
 	chrome_user_data_path = r"C:\Users\caoyang\AppData\Local\Google\Chrome\User Data"
 	regexes = {"html_tag": re.compile(r"<[^>]+>|\n|\t"),	# Remove HTML tags, including '\t' and '\n'
 			   "forbidden_filename_char": re.compile(r"\\|/|:|\?|\*|\"|<|>|\|"),	# Characters which are forbidden in filename (on WINDOWS system)
-			   "number": re.compile(r"\d+"),
+			   "number": re.compile(r"\d+"),	# Extract number
+			   "host": re.compile("https://(.*\.com)"),	# Extract host-like string
 			   }
 	javascript = {"scroll_into_view": "arguments[0].scrollIntoView(true);",
 				  "scroll_into_view_center": "arguments[0].scrollIntoView({behavior: \"instant\", block: \"center\", inline: \"center\"});",

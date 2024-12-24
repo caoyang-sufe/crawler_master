@@ -11,8 +11,8 @@ from bs4 import BeautifulSoup
 from urllib.request import urljoin
 from selenium.webdriver.common.action_chains import ActionChains
 
-from src.crawlers.esg import CRAWLER_NAME
 from src.crawlers.base import BaseCrawler
+from src.crawlers.esg import CRAWLER_NAME
 
 from settings import CRAWLER_DATA_DIR, TEMP_DIR
 

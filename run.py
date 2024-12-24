@@ -7,7 +7,7 @@ import sys
 import time
 import argparse
 
-from src.crawlers import ESGCrawler, CSDNCrawler, ACLAnthologyCrawler
+from src.crawlers import ESGCrawler, CSDNCrawler, ACLAnthologyCrawler, BilibiliCrawler
 from src.tools.easy import initialize_logger, terminate_logger
 
 from settings import CRAWLER_DATA_DIR, LOGGING_DIR, TEMP_DIR
@@ -25,6 +25,7 @@ def easy_run():
 	parser.add_argument("--start_from", type=int)	# @param start_from of `run_esg_downloader`
 	parser.add_argument("--monitor_interval", type=int)	# @param watch_interval of `run_csdn_monitor`
 	parser.add_argument("--n_days_before", type=int)	# @param n_days_before of `run_csdn_displayer`
+	parser.add_argument("--paper_dir", type=str)	# @param 
 	args = parser.parse_args()
 	kwargs = dict()
 	for key, word in args._get_kwargs():
@@ -57,7 +58,7 @@ def run_esg_downloader(category, start_from, **kwargs):
 	esg = ESGCrawler()
 	esg.download_reports(category,
 						 start_from,
-						 download_interval = 20,
+						 download_interval = 20, 
 						 )
 
 def run_csdn_monitor(monitor_interval, **kwargs):
@@ -76,16 +77,19 @@ def run_csdn_displayer(n_days_before, **kwargs):
 									columns = ["view_count"],
 									n_days_before = n_days_before,
 									)
-def run_aclanthology(**kwargs):
+def run_aclanthology_downloader(paper_dir, **kwargs):
 	aclanthology = ACLAnthologyCrawler()
-
-	root = r"D:\code\python\project\caoyang\project_014_mrc\reference\conference"
+	h = r"D:\code\python\project\caoyang\project_014_mrc\reference\conference"
 	for root, dirnames, filenames in os.walk(root):
 		for filename in filenames:
 			if filename.endswith(".pdf"):
 				paper_id = filename[: -4]
-				aclanthology.parse_paper_detail(paper_id, save_dir = os.path.join(CRAWLER_DATA_DIR, "aclanthology"))					
+				aclanthology.download_paper_detail(paper_id, save_dir = os.path.join(CRAWLER_DATA_DIR, "aclanthology"))					
+
+def run_bilibili_downloader(**kwargs):
+	
+
 
 if __name__ == "__main__":
-	# easy_run()	# bash script trigger
-	run_aclanthology()
+	easy_run()	# bash script trigger
+	# run_aclanthology_downloader()

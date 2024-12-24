@@ -16,15 +16,14 @@ from urllib.parse import urlencode
 from urllib.request import urljoin
 from datetime import datetime, timedelta
 
-from src.crawlers.csdn import CRAWLER_NAME
 from src.crawlers.base import BaseCrawler
+from src.crawlers.aclanthology import CRAWLER_NAME
 
 from settings import CRAWLER_DATA_DIR, TEMP_DIR
 
 
 class ACLAnthologyCrawler(BaseCrawler):
 	url_host = "https://aclanthology.org/"
-
 	headers = {
 		"paper_detail": """Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
 Accept-Encoding: gzip, deflate, br, zstd
@@ -50,19 +49,22 @@ sec-ch-ua-platform: \"Windows\"""",
 				 **kwargs,
 				 ):
 		super(ACLAnthologyCrawler, self).__init__(**kwargs)
-		self.monitor_save_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, "monitor")	# Save the monitor data
-		os.makedirs(self.monitor_save_dir, exist_ok=True)
-
-	# Parse paper details, e.g. title, authors, abstract, citation, bibtex, pdf
+		self.download_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, "download")	# Save the downloaded data
+		os.makedirs(self.download_dir, exist_ok=True)
+		
+	# Download paper details, e.g. title, authors, abstract, citation, bibtex, pdf
 	# @param paper_id: Str, e.g. "2024.acl-long.1"
-	def parse_paper_detail(self,
-						   paper_id,
-						   save_dir = "./",
-						   download_bibtex = True,
-						   download_pdf = True,
-						   ):
-		os.makedirs(save_dir, exist_ok=True)
-		detail_dict = dict()
+	# @param save_dir: Str, directory to save the download paper data, default as `self.download_dir`
+	# @param download_bibtex: Boolean, whether to download bibtex
+	# @param download_pdf: Boolean, whether to download pdf 
+	def download_paper_details(self,
+							   paper_id,
+							   save_dir = None,
+							   download_bibtex = True,
+							   download_pdf = True,
+							   ):
+		if save_dir is None:
+			self.monitor_save_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, "monitor")	# Save the monitor data
 		url_paper_detail = urljoin(self.url_host, paper_id)
 		headers_paper_detail = BaseCrawler.headers_to_dict(headers=self.headers["paper_detail"])
 		response = self.easy_requests(method = "GET",
@@ -72,13 +74,13 @@ sec-ch-ua-platform: \"Windows\"""",
 									  timeout = 30,
 									  )
 		soup = BeautifulSoup(response.text, "lxml")
-		# Title
+		# Paper title
 		title_tag = soup.find("h2", id="title")
 		title = self.regexes["html_tag"].sub(str(), str(title_tag))
-		# Authors
+		# Paper authors
 		authors_tag = soup.find('p', class_="lead")
 		authors = [self.regexes["html_tag"].sub(str(), str(a_tag)) for a_tag in authors_tag.find_all('a')]
-		# Abstract
+		# Paper abstract
 		abstract_tag = soup.find("div", class_="card-body acl-abstract")
 		abstract = None
 		if abstract_tag is None:
@@ -86,13 +88,12 @@ sec-ch-ua-platform: \"Windows\"""",
 		else:
 			abstract = self.regexes["html_tag"].sub(str(), str(abstract_tag))
 			abstract = abstract.lstrip("Abstract")
-		# Citation
+		# Paper citation
 		cite_acl_tag = soup.find("span", id="citeACL")
 		cite_acl = self.regexes["html_tag"].sub(str(), str(cite_acl_tag))
-
 		cite_informal_tag = soup.find("span", id="citeRichText")
 		cite_informal = self.regexes["html_tag"].sub(str(), str(cite_informal_tag))
-		# Bibtex
+		# Paper bibtex
 		if download_bibtex:
 			url_bibtex = url_paper_detail + ".bib"
 			response = self.easy_requests(method = "GET",
@@ -103,7 +104,7 @@ sec-ch-ua-platform: \"Windows\"""",
 										  )
 			with open(os.path.join(save_dir, f"{paper_id}.bib"), "wb") as f:
 				f.write(response.content)
-		# PDF
+		# Paper PDF
 		if download_pdf:
 			url_pdf = url_paper_detail + ".pdf"
 			response = self.easy_requests(method = "GET",
@@ -114,14 +115,13 @@ sec-ch-ua-platform: \"Windows\"""",
 										  )
 			with open(os.path.join(save_dir, f"{paper_id}.pdf"), "wb") as f:
 				f.write(response.content)
-		# Detail
-		detail_dict = {
-			"title": title,
-			"authors": authors,
-			"abstract": abstract,
-			"cite_acl": cite_acl,
-			"cite_informal": cite_informal,
-		}
+		# Export data
+		detail_dict = {"title": title,
+					   "authors": authors,
+					   "abstract": abstract,
+					   "cite_acl": cite_acl,
+					   "cite_informal": cite_informal,
+					   }
 		with open(os.path.join(save_dir, f"{paper_id}.json"), 'w', encoding="utf8") as f:
 			json.dump(detail_dict, f, indent=4)
 		return detail_dict

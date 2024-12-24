@@ -15,8 +15,8 @@ from urllib.parse import urlencode
 from urllib.request import urljoin
 from datetime import datetime, timedelta
 
-from src.crawlers.csdn import CRAWLER_NAME
 from src.crawlers.base import BaseCrawler
+from src.crawlers.csdn import CRAWLER_NAME
 
 from settings import CRAWLER_DATA_DIR, TEMP_DIR
 
@@ -156,12 +156,13 @@ sec-ch-ua-platform: \"Windows\"""",
 			if read_article_ids:	
 				for i, read_article_id in enumerate(read_article_ids):
 					logging.info(f"Reading article {read_article_id} ...")
-					response = self.easy_requests(method = "GET",
-												  url = url_formatter_article(article_id = read_article_id),
-												  max_trial = 5,
-												  headers = headers_article,
-												  timeout = 30,
-												  )
+					response = self.easy_requests(
+						method = "GET",
+						url = url_formatter_article(article_id = read_article_id),
+						max_trial = 5,
+						headers = headers_article,
+						timeout = 30,
+					)
 					if response is None:
 						logging.warning(f"  - Fail to read article {read_article_id}!")
 					else:
@@ -177,12 +178,13 @@ sec-ch-ua-platform: \"Windows\"""",
 			if watch_article_ids:
 				while True:
 					# Request for `business_list`
-					response = self.easy_requests(method = "GET",
-												  url = url_business_list,
-												  max_trial = -1,
-												  headers = headers_business_list,
-												  timeout = 30,
-												  )
+					response = self.easy_requests(
+						method = "GET",
+						url = url_business_list,
+						max_trial = -1,
+						headers = headers_business_list,
+						timeout = 30,
+					)
 					json_response = response.json()
 					try:
 						# 2024/08/03 01:44:57
@@ -244,13 +246,13 @@ sec-ch-ua-platform: \"Windows\"""",
 				# ---------------------------------------------------------
 				statistics_numbers = list()
 				while True:
-					response = self.easy_requests(method = "GET",
-												  url = url_user,
-												  max_trial = -1,
-												  headers = headers_profile,
-												  timeout = 30,
-												  )
-					
+					response = self.easy_requests(
+						method = "GET",
+						url = url_user,
+						max_trial = -1,
+						headers = headers_profile,
+						timeout = 30,
+					)
 					html = response.text
 					soup = BeautifulSoup(html, "lxml")
 					user_profile_div = soup.find("div", class_="user-profile-head-info-r-c")	# Statistics number area 1
@@ -330,6 +332,3 @@ sec-ch-ua-platform: \"Windows\"""",
 				count = combined_dataframe_slices.loc[i, column]
 				datetime_string = combined_dataframe_slices.loc[i, "datetime"]
 				logging.info(f"    - {title} {count} {datetime_string}")
-		
-		
-		
