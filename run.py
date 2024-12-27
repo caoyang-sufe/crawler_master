@@ -87,9 +87,15 @@ def run_aclanthology_downloader(paper_dir, **kwargs):
 				aclanthology.download_paper_detail(paper_id, save_dir = os.path.join(CRAWLER_DATA_DIR, "aclanthology"))					
 
 def run_bilibili_downloader(**kwargs):
-	
-
+	bbc = BilibiliCrawler()
+	# bbc.easy_download_video(bvid="BV11g411A7zx")	# Accessible
+	# bbc.easy_download_episode(ep_id="ep247270")	# 2024/12/28 03:51:26 Unavailable now
+	# bbc.download(bvid = "BV11g411A7zx")	# Accessible
+	# bbc.easy_download(url = "https://www.bilibili.com/video/BV1jf4y1h73r")	Accessible
+	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep399420")	# Accessible
+	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep247270")	# Accessible
 
 if __name__ == "__main__":
-	easy_run()	# bash script trigger
+	# easy_run()	# bash script trigger
 	# run_aclanthology_downloader()
+	run_bilibili_downloader()

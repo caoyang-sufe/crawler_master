@@ -2,6 +2,6 @@
 # @author: caoyang
 # @email: caoyang@stu.sufe.edu.cn
 
-CRAWLER_NAME = "csdn"
+CRAWLER_NAME = "bilibili"
 
 

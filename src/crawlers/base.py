@@ -150,3 +150,39 @@ class BaseCrawler(BaseClass):
 		if quit_flag:
 			driver.quit()
 		return _cookie_to_string(cookies)
+
+	# @param string: Str, string contained nest structure
+	# @param nest_symbol: Tuple, e.g. ('(', ')'), ('[', ']'), ('{', '}')
+	# @param start_at: Int, search start index
+	# @param max_return: Int, The maximum number of parsed results
+	@classmethod
+	def easy_match_nest_structure(cls, string, nest_symbol, start_at = 0, max_return = -1):
+		matched_nest_structures = list()
+		matched_string = None
+		count = None
+		index = start_at - 1
+		while index < len(string) - 1:
+			index += 1
+			if count is None:
+				if string[index] == nest_symbol[0]:
+					# Start!
+					matched_string = string[index]
+					count = 1
+				else:
+					# Not start yet
+					continue
+			else:
+				matched_string += string[index]
+				# Start already
+				if string[index] == nest_symbol[0]:
+					count += 1
+				elif string[index] == nest_symbol[1]:
+					count -= 1
+					if count == 0:
+						# Matched already
+						matched_nest_structures.append(matched_string)
+						if len(matched_nest_structures) == max_return:
+							return matched_nest_structures
+						matched_string = None
+						count = None
+		return matched_nest_structures
