@@ -89,10 +89,10 @@ def run_aclanthology_downloader(paper_dir, **kwargs):
 
 def run_bilibili_downloader(**kwargs):
 	bbc = BilibiliCrawler()
-	# bbc.easy_download_video(bvid="BV11g411A7zx")	# Accessible
+	# bbc.easy_download_video(bvid="BV1N94y1P7Si")	# Accessible
 	# bbc.easy_download_episode(ep_id="ep247270")	# 2024/12/28 03:51:26 Unavailable now
 	# bbc.download(bvid = "BV11g411A7zx")	# Accessible
-	# bbc.easy_download(url = "https://www.bilibili.com/video/BV1jf4y1h73r")	Accessible
+	bbc.easy_download(url = "https://www.bilibili.com/video/BV1B39EYdE1o")	# Accessible
 	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep399420")	# Accessible
 	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep247270")	# Accessible
 
@@ -215,9 +215,9 @@ def run_77shu_downloader(**kwargs):
 if __name__ == "__main__":
 	# easy_run()	# bash script trigger
 	# run_aclanthology_downloader()
-	# run_bilibili_downloader()
+	run_bilibili_downloader()
 	# run_qidian_downloader()
 	# run_bqg_downloader()
 	# run_bqg_top_downloader()
 	# run_bixia_downloader()
-	run_77shu_downloader()
+	# run_77shu_downloader()

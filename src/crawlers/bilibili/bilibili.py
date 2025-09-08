@@ -464,11 +464,12 @@ Connection: keep-alive""",	# Common headers for requests
 					save_dir = os.path.join(self.download_dir, episode_name)
 					os.makedirs(save_dir, exist_ok=True)
 					video_title = episode["titleFormat"] + episode["longTitle"]
+					video_title_valid = self.regexes["forbidden_filename_char"].sub(str(), video_title)
 					self.download(
 						bvid = str(episode["bvid"]),
-						save_path = os.path.join(save_dir,  + f"{video_title}.mp4"),
-						video_save_path = os.path.join(save_dir, f"{video_title}.m4s"),
-						audio_save_path = os.path.join(save_dir, f"{video_title}.mp3"),
+						save_path = os.path.join(save_dir,  + f"{video_title_valid}.mp4"),
+						video_save_path = os.path.join(save_dir, f"{video_title_valid}.m4s"),
+						audio_save_path = os.path.join(save_dir, f"{video_title_valid}.mp3"),
 					)
 				else:	# Unable to download VIP anime
 					logging.warning(f"Permission denied: badge is {episode_badge}")
@@ -478,10 +479,11 @@ Connection: keep-alive""",	# Common headers for requests
 			bvid = initial_state["bvid"]
 			video_data = initial_state["videoData"]
 			video_title = video_data["title"]
+			video_title_valid = self.regexes["forbidden_filename_char"].sub(str(), video_title)
 			self.download(
 				bvid = bvid,
-				save_path = os.path.join(self.download_dir, f"{video_title}.mp4"),
-				video_save_path = os.path.join(self.download_dir, f"{video_title}.m4s"),
-				audio_save_path = os.path.join(self.download_dir, f"{video_title}.mp3"),
+				save_path = os.path.join(self.download_dir, f"{video_title_valid}.mp4"),
+				video_save_path = os.path.join(self.download_dir, f"{video_title_valid}.m4s"),
+				audio_save_path = os.path.join(self.download_dir, f"{video_title_valid}.mp3"),
 			)
 			return 2
