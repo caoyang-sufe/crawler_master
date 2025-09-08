@@ -65,19 +65,6 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 		self.download_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, "download")	# Save the downloaded data
 		os.makedirs(self.download_dir, exist_ok=True)
 
-	# Deal with keyword arguments `url` and `html`
-	def _easy_soup(self, url, html):
-		if html is None:
-			assert url is not None, "Keyword arguments `url` and `html` are both NoneType!"
-			html = self.easy_requests(
-				method = "GET",
-				url = url,
-				max_trial = 5,
-				headers = BaseCrawler.headers_to_dict(headers=self.headers["chrome"]),
-				timeout = 30,
-			).text
-		return BeautifulSoup(html, "lxml")
-
 	# Parse top books in https://www.bqg128.com/top/
 	# @return top_books: Dict[category[List[Dict[bookName[Str], bookURL[Str]]]]]
 	def parse_top_books(self):

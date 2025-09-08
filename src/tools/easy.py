@@ -58,3 +58,11 @@ def update_args(args, **kwargs):
 		if not key in args:
 			logging.warning(f"Key {key} not in args but you want to change its value to {value}!")
 		args.__setattr__(key, value)
+
+def easy_remove_duplicates(lst, key=None, keep="first"):
+	if keep == 'last':
+		return list(reversed(list({x[key]: x for x in reversed(lst)}.values())))
+	elif keep == "first":
+		return list({x[key]: x for x in lst}.values())
+	else:
+		raise Exception(f"Expect keyword argument `keep` is \"first\" or \"last\" but got \"{keep}\"")

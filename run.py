@@ -8,7 +8,7 @@ import time
 import logging
 import argparse
 
-from src.crawlers import ESGCrawler, CSDNCrawler, ACLAnthologyCrawler, BilibiliCrawler, QidianCrawler, BQG128Crawler
+from src.crawlers import ESGCrawler, CSDNCrawler, ACLAnthologyCrawler, BilibiliCrawler, QidianCrawler, BQG128Crawler, Bxwxx7Crawler, Shu77Crawler
 from src.tools.easy import initialize_logger, terminate_logger
 
 from settings import CRAWLER_DATA_DIR, LOGGING_DIR, TEMP_DIR
@@ -148,15 +148,18 @@ def run_bqg_downloader(**kwargs):
 	]
 	book_urls = [
 		# "https://www.bqg128.com/book/42558/", # zeds-njly
-		"https://www.bqg128.com/book/24031/", # 
-		"https://www.bqg128.com/book/72728/", # 
-		"https://www.bqg128.com/book/109747/", # 
-		"https://www.bqg128.com/book/18497/", # 
-		"https://www.bqg128.com/book/71900/", # 
-		"https://www.bqg128.com/book/106595/", # 
-		"https://www.bqg128.com/book/84381/", # 
-		"https://www.bqg128.com/book/105865/", # 
-		"https://www.bqg128.com/book/138474/", # 
+		"https://www.bqg128.com/book/24031/",
+		"https://www.bqg128.com/book/72728/",
+		"https://www.bqg128.com/book/109747/",
+		"https://www.bqg128.com/book/18497/",
+		"https://www.bqg128.com/book/71900/",
+		"https://www.bqg128.com/book/106595/",
+		"https://www.bqg128.com/book/84381/",
+		"https://www.bqg128.com/book/105865/",
+		"https://www.bqg128.com/book/138474/",
+	]
+	book_urls = [
+		"https://www.bqg128.com/book/138474/",
 	]
 	for book_url in book_urls:
 		logging.info(f"Download: {book_url.rstrip('/').split('/')[-1]}")
@@ -184,10 +187,37 @@ def run_bqg_top_downloader():
 			book = bqg.parse_book(book_url, interval = 2)
 	terminate_logger(logger)	
 
+def run_bixia_downloader(**kwargs):
+	time_string = time.strftime("%Y%m%d%H%M%S")
+	logger = initialize_logger(f"./logging/bqg128_downloader_{time_string}.log")
+	bixia = Bxwxx7Crawler()
+	book_urls = [
+		"https://www.bxwxx7.com/article/122858/", # qcxhbcrc
+	]
+	for book_url in book_urls:
+		logging.info(f"Download: {book_url.rstrip('/').split('/')[-1]}")
+		book = bixia.parse_book(book_url, interval = 2)
+	terminate_logger(logger)	
+	
+def run_77shu_downloader(**kwargs):
+	time_string = time.strftime("%Y%m%d%H%M%S")
+	logger = initialize_logger(f"./logging/bqg128_downloader_{time_string}.log")
+	shu77 = Shu77Crawler()
+	book_urls = [
+		"https://www.77shu.com/xiaoshuo/167621/", # qcxhbcrc
+	]
+	for book_url in book_urls:
+		logging.info(f"Download: {book_url.rstrip('/').split('/')[-1]}")
+		book = shu77.parse_book(book_url, interval = 2)
+	terminate_logger(logger)	
+
+
 if __name__ == "__main__":
 	# easy_run()	# bash script trigger
 	# run_aclanthology_downloader()
 	# run_bilibili_downloader()
 	# run_qidian_downloader()
-	run_bqg_downloader()
+	# run_bqg_downloader()
 	# run_bqg_top_downloader()
+	# run_bixia_downloader()
+	run_77shu_downloader()
