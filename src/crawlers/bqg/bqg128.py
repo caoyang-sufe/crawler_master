@@ -197,11 +197,11 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 			book_text += f"\n{reader_content}\n"
 			book["content"].append({"title": chapter_name, "text": reader_content})
 			time.sleep(interval)
-		save_name = f"{book_id}-{book_info['bookName']}"
-		save_name = f"{book_id}"
-		with open(os.path.join(save_dir, f"{save_name}.json"), 'w', encoding="utf8") as f:
-			json.dump(book, f, ensure_ascii=False)
-		with open(os.path.join(save_dir, f"{save_name}.txt"), 'w', encoding="utf8") as f:
+		save_name_txt = f"{book_id}-{book_info['bookName']}"
+		save_name_json = f"{book_id}"
+		with open(os.path.join(save_dir, f"{save_name_txt}.txt"), 'w', encoding="utf8") as f:
 			f.write(book_text)
+		with open(os.path.join(save_dir, f"{save_name_json}.json"), 'w', encoding="utf8") as f:
+			json.dump(book, f, ensure_ascii=False)
 		return book
 

@@ -110,12 +110,12 @@ def run_bqg_downloader(**kwargs):
 	bqg = BQG128Crawler()
 
 	book_urls = [
-		# "https://www.bqg128.com/book/51676/",	# 斗破苍穹淫宗肆虐
-		# "https://www.bqg128.com/book/69296/",	# 意恋征服系列
-		# "https://www.bqg128.com/book/170405/",	# 警察系列
-		# "https://www.bqg128.com/book/8885/", # 黄蓉系列
-		# "https://www.bqg128.com/book/6692/", # SM痴女系作品
-		"https://www.bqg128.com/book/82229/",	# 淫虐牢笼
+		# "https://www.bqg128.com/book/51676/",	# dpcqyzsn
+		# "https://www.bqg128.com/book/69296/",	# ylzf
+		# "https://www.bqg128.com/book/170405/",	# jcxl
+		# "https://www.bqg128.com/book/8885/", # hrxl
+		# "https://www.bqg128.com/book/6692/", # smcnxl
+		"https://www.bqg128.com/book/82229/",
 		"https://www.bqg128.com/book/6625/",
 		"https://www.bqg128.com/book/55170/",
 		"https://www.bqg128.com/book/42323/",
@@ -145,6 +145,18 @@ def run_bqg_downloader(**kwargs):
 		"https://www.bqg128.com/book/116850/",
 		"https://www.bqg128.com/book/108352/",
 		"https://www.bqg128.com/book/13112/",
+	]
+	book_urls = [
+		# "https://www.bqg128.com/book/42558/", # zeds-njly
+		"https://www.bqg128.com/book/24031/", # 
+		"https://www.bqg128.com/book/72728/", # 
+		"https://www.bqg128.com/book/109747/", # 
+		"https://www.bqg128.com/book/18497/", # 
+		"https://www.bqg128.com/book/71900/", # 
+		"https://www.bqg128.com/book/106595/", # 
+		"https://www.bqg128.com/book/84381/", # 
+		"https://www.bqg128.com/book/105865/", # 
+		"https://www.bqg128.com/book/138474/", # 
 	]
 	for book_url in book_urls:
 		logging.info(f"Download: {book_url.rstrip('/').split('/')[-1]}")
@@ -177,5 +189,5 @@ if __name__ == "__main__":
 	# run_aclanthology_downloader()
 	# run_bilibili_downloader()
 	# run_qidian_downloader()
-	# run_bqg_downloader()
-	run_bqg_top_downloader()
+	run_bqg_downloader()
+	# run_bqg_top_downloader()
