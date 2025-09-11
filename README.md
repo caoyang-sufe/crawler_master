@@ -31,3 +31,7 @@ Monitor data will be saved at
 # ACLAnthology
 
 论文信息下载
+
+# 音乐网站
+
+网易云音乐、酷我音乐、QQ音乐
