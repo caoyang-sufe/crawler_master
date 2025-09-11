@@ -8,7 +8,18 @@ import time
 import logging
 import argparse
 
-from src.crawlers import ESGCrawler, CSDNCrawler, ACLAnthologyCrawler, BilibiliCrawler, QidianCrawler, BQG128Crawler, Bxwxx7Crawler, Shu77Crawler
+from src.crawlers import (
+	ESGCrawler, 
+	CSDNCrawler, 
+	ACLAnthologyCrawler, 
+	BilibiliCrawler, 
+	QidianCrawler, 
+	BQG128Crawler, 
+	Bxwxx7Crawler, 
+	Shu77Crawler,
+	KuwoCrawler,
+	NeteaseCrawler,
+)
 from src.tools.easy import initialize_logger, terminate_logger
 
 from settings import CRAWLER_DATA_DIR, LOGGING_DIR, TEMP_DIR
@@ -78,6 +89,7 @@ def run_csdn_displayer(n_days_before, **kwargs):
 									columns = ["view_count"],
 									n_days_before = n_days_before,
 									)
+
 def run_aclanthology_downloader(paper_dir, **kwargs):
 	aclanthology = ACLAnthologyCrawler()
 	h = r"D:\code\python\project\caoyang\project_014_mrc\reference\conference"
@@ -92,9 +104,9 @@ def run_bilibili_downloader(**kwargs):
 	# bbc.easy_download_video(bvid="BV1N94y1P7Si")	# Accessible
 	# bbc.easy_download_episode(ep_id="ep247270")	# 2024/12/28 03:51:26 Unavailable now
 	# bbc.download(bvid = "BV11g411A7zx")	# Accessible
-	bbc.easy_download(url = "https://www.bilibili.com/video/BV1B39EYdE1o")	# Accessible
 	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep399420")	# Accessible
 	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep247270")	# Accessible
+	bbc.easy_download(url = "https://www.bilibili.com/video/BV1B39EYdE1o")	# Accessible
 
 def run_qidian_downloader(**kwargs):
 	time_string = time.strftime("%Y%m%d%H%M%S")
@@ -166,7 +178,6 @@ def run_bqg_downloader(**kwargs):
 		book = bqg.parse_book(book_url, interval = 2)
 	terminate_logger(logger)	
 
-
 def run_bqg_top_downloader():
 	time_string = time.strftime("%Y%m%d%H%M%S")
 	logger = initialize_logger(f"./logging/bqg128_top_downloader_{time_string}.log")
@@ -189,7 +200,7 @@ def run_bqg_top_downloader():
 
 def run_bixia_downloader(**kwargs):
 	time_string = time.strftime("%Y%m%d%H%M%S")
-	logger = initialize_logger(f"./logging/bqg128_downloader_{time_string}.log")
+	logger = initialize_logger(f"./logging/bixia_downloader_{time_string}.log")
 	bixia = Bxwxx7Crawler()
 	book_urls = [
 		"https://www.bxwxx7.com/article/122858/", # qcxhbcrc
@@ -201,7 +212,7 @@ def run_bixia_downloader(**kwargs):
 	
 def run_77shu_downloader(**kwargs):
 	time_string = time.strftime("%Y%m%d%H%M%S")
-	logger = initialize_logger(f"./logging/bqg128_downloader_{time_string}.log")
+	logger = initialize_logger(f"./logging/77shu_downloader_{time_string}.log")
 	shu77 = Shu77Crawler()
 	book_urls = [
 		"https://www.77shu.com/xiaoshuo/167621/", # qcxhbcrc
@@ -211,13 +222,23 @@ def run_77shu_downloader(**kwargs):
 		book = shu77.parse_book(book_url, interval = 2)
 	terminate_logger(logger)	
 
+def run_kuwo_downloader(**kwargs):
+	kuwo = KuwoCrawler()
+	kuwo.easy_download(mid="32673026")	
+
+
+def run_netease_download(**kwargs):
+	netease = NeteaseCrawler()
+	netease.easy_download(song_id="1922872670")
 
 if __name__ == "__main__":
 	# easy_run()	# bash script trigger
 	# run_aclanthology_downloader()
-	run_bilibili_downloader()
+	# run_bilibili_downloader()
 	# run_qidian_downloader()
 	# run_bqg_downloader()
 	# run_bqg_top_downloader()
 	# run_bixia_downloader()
 	# run_77shu_downloader()
+	run_kuwo_downloader()
+	# run_netease_download()
