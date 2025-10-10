@@ -232,7 +232,7 @@ def run_netease_download(**kwargs):
 	netease.easy_download(song_id="1922872670")
 
 if __name__ == "__main__":
-	# easy_run()	# bash script trigger
+	easy_run()	# bash script trigger
 	# run_aclanthology_downloader()
 	# run_bilibili_downloader()
 	# run_qidian_downloader()
@@ -240,5 +240,5 @@ if __name__ == "__main__":
 	# run_bqg_top_downloader()
 	# run_bixia_downloader()
 	# run_77shu_downloader()
-	run_kuwo_downloader()
+	# run_kuwo_downloader()
 	# run_netease_download()

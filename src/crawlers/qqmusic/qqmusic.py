@@ -44,7 +44,7 @@ class QQ(object):
 		self.session.headers = self.headers.copy()
 		self.session.get(self.url_main)
  
-	def search_for_song_id(self, song_name: str, driver: webdriver.Firefox, n_result: int=1) -> list:
+	def search_for_song_id(self, song_name: str, driver: webdriver.Chrome, n_result: int=1) -> list:
 		"""
 		Search the song ids for the given song name.
 		Here the selenium driver is used because the search results of NetEase is in the <iframe>...</iframe> label which is hard to deal with by simple requests.
@@ -56,7 +56,7 @@ class QQ(object):
 		"""
 		raise NotImplementedError
 		
-	def download_by_song_id(self, song_id: str, save_path: str=None, driver: webdriver.Firefox=None) -> None:
+	def download_by_song_id(self, song_id: str, save_path: str=None, driver: webdriver.Chrome=None) -> None:
 		"""
 		Download the song by id and write it into local file. 
 		"""																
@@ -68,7 +68,7 @@ class QQ(object):
 		with open(save_path, 'wb') as f: 
 			f.write(r.content)				
  
-	def request_for_song_url(self, song_id: str, driver: webdriver.Firefox=None) -> str:
+	def request_for_song_url(self, song_id: str, driver: webdriver.Chrome=None) -> str:
 		"""
 		Get the resource URL of the song needed to be downloaded. 
 		Note that QQ Music is the most complex that selenium is needed to get the resource URL.
@@ -89,15 +89,15 @@ class QQ(object):
 				if result is None: 
 					continue
 				break
-			except: 
+			except:
 				continue
 		song_url = result['purl']					
 		return song_url
  
 	def test(self):
-		options = webdriver.FirefoxOptions()							
+		options = webdriver.ChromeOptions()							
 		options.add_argument('--headless')								
-		driver = webdriver.Firefox(options=options)						
+		driver = webdriver.Chrome(options=options)						
 		song_id = 'm9n8d42'										
 		r = self.download_by_song_id(
 			song_id,

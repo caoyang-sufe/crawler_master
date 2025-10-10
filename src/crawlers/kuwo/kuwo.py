@@ -19,7 +19,6 @@ from src.crawlers.kuwo import CRAWLER_NAME
 
 from settings import CRAWLER_DATA_DIR, TEMP_DIR
 
-
 class KuwoCrawler(BaseCrawler):
 	url_host = "https://www.kuwo.cn/"
 	url_summary = {
