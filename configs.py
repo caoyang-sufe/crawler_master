@@ -2,7 +2,7 @@
 # @author: caoyang
 # @email: caoyang@stu.sufe.edu.cn
 
-import argparser
+import argparse
 from copy import deepcopy
 
 class BaseConfig:

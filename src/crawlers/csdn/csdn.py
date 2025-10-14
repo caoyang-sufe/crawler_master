@@ -22,22 +22,22 @@ from settings import CRAWLER_DATA_DIR, TEMP_DIR
 
 
 class CSDNCrawler(BaseCrawler):
-	url_host = "https://blog.csdn.net"
-	url_formatter_user_by_domain = "https://{domain}.blog.csdn.net".format
-	url_formatter_user_by_username = urljoin(url_host, "{username}").format
-	api_article = "/article/details/"
-	api_business_list = "/community/home-api/v1/get-business-list?"
-	query_dict_of_api_business_list = {"page": 0,
-									   "size": 100,
-									   "businessType": "blog",
-									   "orderby": str(),
-									   "noMore": "false",
-									   "year": str(),
-									   "month": str(),
-									   "username": "CY19980216",
-									   }
-	headers = {
-		"business_list": """Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+    url_host = "https://blog.csdn.net"
+    url_formatter_user_by_domain = "https://{domain}.blog.csdn.net".format
+    url_formatter_user_by_username = urljoin(url_host, "{username}").format
+    api_article = "/article/details/"
+    api_business_list = "/community/home-api/v1/get-business-list?"
+    query_dict_of_api_business_list = {"page": 0,
+                                       "size": 100,
+                                       "businessType": "blog",
+                                       "orderby": str(),
+                                       "noMore": "false",
+                                       "year": str(),
+                                       "month": str(),
+                                       "username": "CY19980216",
+                                       }
+    headers = {
+        "business_list": """Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
 Accept-Encoding: gzip, deflate, br, zstd
 Accept-Language: zh-CN,zh;q=0.9
 Cache-Control: max-age=0
@@ -54,7 +54,7 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 sec-ch-ua: "Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"
 sec-ch-ua-mobile: ?0
 sec-ch-ua-platform: \"Windows\"""",
-		"article": """Host: caoyang.blog.csdn.net
+        "article": """Host: caoyang.blog.csdn.net
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv: 95.0) Gecko/20100101 Firefox/95.0
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
 Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
@@ -67,7 +67,7 @@ Sec-Fetch-Mode: navigate
 Sec-Fetch-Site: none
 Sec-Fetch-User: ?1
 Cache-Control: max-age=0""",
-		"profile": """Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+        "profile": """Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
 Accept-Encoding: gzip, deflate, br, zstd
 Accept-Language: zh-CN,zh;q=0.9
 Cache-Control: max-age=0
@@ -83,257 +83,264 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 sec-ch-ua: "Not)A;Brand";v="99", "Google Chrome";v="127", "Chromium";v="127"
 sec-ch-ua-mobile: ?0
 sec-ch-ua-platform: \"Windows\"""",
-	}
-	watch_article_ids = []	# Default `watch_article_ids`
-	read_article_ids = [
-		"151874936", "152050815", "151968907", "148641567", "150592993",
-		"148512070", "148512070", "148659260", "148677582", "148343981",
-		"147596961", "147596875", "147936000", "147654635", "148382586",
-		"147903242", "147568082", "147513573", "147464165", "147428712",
-		"147162527", "147078723", "146883693", "143653279", "143471542",
-		"144775662", "143628401", "145690187", "144010237", "145502672",
-		"146468206", "146460808", "145088488", "146387569", "143099065",  
-		"144596444", "144651727", "144133212", "144278328", "143869819",  
-		"140899018", "142684656", "141498497", "140747915", "140621717",  
-		"143350101", "143310248", "142441347", "135325071", "141369623",  
-		"140595950", "139551143", "138088546", "137213986", "136645892",  
-		"136088465", "135319365", "134483304", "134442145", "133832711",
-	]	# Default `read_article_ids`
+    }
+    watch_article_ids = []	# Default `watch_article_ids`
+    read_article_ids = [
+        "151874936", "152050815", "151968907", "148641567", "150592993",
+        "148512070", "148512070", "148659260", "148677582", "148343981",
+        "147596961", "147596875", "147936000", "147654635", "148382586",
+        "147903242", "147568082", "147513573", "147464165", "147428712",
+        "147162527", "147078723", "146883693", "143653279", "143471542",
+        "144775662", "143628401", "145690187", "144010237", "145502672",
+        "146468206", "146460808", "145088488", "146387569", "143099065",  
+        "144596444", "144651727", "144133212", "144278328", "143869819",  
+        "140899018", "142684656", "141498497", "140747915", "140621717",  
+        "143350101", "143310248", "142441347", "135325071", "141369623",  
+        "140595950", "139551143", "138088546", "137213986", "136645892",  
+        "136088465", "135319365", "134483304", "134442145", "133832711",
+        "124877401",
+    ]	# Default `read_article_ids`
 
-	def __init__(self,
-				 **kwargs,
-				 ):
-		super(CSDNCrawler, self).__init__(**kwargs)
-		self.monitor_save_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, "monitor")	# Save the monitor data
-		os.makedirs(self.monitor_save_dir, exist_ok=True)
+    def __init__(self,
+                 **kwargs,
+                 ):
+        super(CSDNCrawler, self).__init__(**kwargs)
+        self.monitor_save_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, "monitor")	# Save the monitor data
+        os.makedirs(self.monitor_save_dir, exist_ok=True)
 
-	# Monitor and increase the view-count of articles
-	# @param domain: High level CSDN users usually have DIY domain name, e.g. my domain name is "caoyang" and corresponding home page is "https://caoyang.blog.csdn.net"
-	# @param username: CSDN username, e.g. my username is "CY19980216" and the corresponding home page is "https://blog.csdn.net/CY19980216"
-	# @param watch_article_ids: Articles which are required to be watched to monitor the view-count, default `self.watch_article_ids`
-	# @param read_article_ids: Articles which are required to be read to increase the view-count, default `self.read_article_ids`
-	# @param max_view_count: Max view-count of `read_article_ids`
-	# @param monitor_interval: Interval time between two loops
-	# @param kwargs: Other keyword arguments used to update `self.query_dict_of_api_business_list`
-	def monitor_user_data(self,
-						  domain = "caoyang",
-						  username = "CY19980216",
-						  watch_article_ids = None,
-						  read_article_ids = None,
-						  max_view_count = 10000,
-						  monitor_interval = 120,
-						  **kwargs,
-						  ):
-		def _tag_to_number(_tag):
-			_tag_string = str(_tag.string).replace(',', str())
-			if _tag_string.isdecimal():
-				return int(_tag_string)
-			else:
-				return -1
-		running_timestamp = time.strftime("%Y%m%d%H%M%S")
-		if watch_article_ids is None:
-			watch_article_ids = self.watch_article_ids[:]
-		if read_article_ids is None:
-			read_article_ids = self.read_article_ids[:]
-		if domain is None:
-			url_user = self.url_formatter_user_by_username(username=username)
-		else:
-			url_user = self.url_formatter_user_by_domain(domain=domain)
-		logging.info(f"`url_user: {url_user}")
-		url_formatter_article = urljoin(url_user, self.api_article + "{article_id}").format
-		query_dict = deepcopy(self.query_dict_of_api_business_list)
-		query_dict["username"] = username
-		for key, word in kwargs.items():
-			if key in query_dict:
-				query_dict[key] = word
-		query_string = urlencode(query_dict)
-		logging.info(f"Query string: {query_string}")
-		url_business_list = urljoin(url_user, self.api_business_list + query_string)
-		logging.info(f"`url_business_list`: {url_business_list}")
-		headers_business_list = BaseCrawler.headers_to_dict(headers=self.headers["business_list"])
-		headers_article = BaseCrawler.headers_to_dict(headers=self.headers["article"])
-		headers_profile = BaseCrawler.headers_to_dict(headers=self.headers["profile"])
-		while True:
-			monitor_start_time = time.time()
-			# ---------------------------------------------------------
-			# Step 1: Read each article to increase read-count
-			# ---------------------------------------------------------
-			if read_article_ids:	
-				for i, read_article_id in enumerate(read_article_ids):
-					logging.info(f"Reading article {read_article_id} ...")
-					response = self.easy_requests(
-						method = "GET",
-						url = url_formatter_article(article_id = read_article_id),
-						max_trial = 5,
-						headers = headers_article,
-						timeout = 30,
-					)
-					if response is None:
-						logging.warning(f"  - Fail to read article {read_article_id}!")
-					else:
-						logging.info(f"  - Successfully read article {read_article_id}!")	
-						soup = BeautifulSoup(response.text, "lxml")
-						read_count_span = soup.find("span", class_="read-count")
-						read_count_string = str(read_count_span.string)
-						read_count = int(self.regexes["number"].findall(read_count_string)[0])
-						logging.info(f"  - Read count: {read_count_string}")
-			# ---------------------------------------------------------
-			# Step 2: Watch the statistics number of each article
-			# ---------------------------------------------------------
-			if watch_article_ids:
-				while True:
-					# Request for `business_list`
-					response = self.easy_requests(
-						method = "GET",
-						url = url_business_list,
-						max_trial = -1,
-						headers = headers_business_list,
-						timeout = 30,
-					)
-					json_response = response.json()
-					try:
-						# 2024/08/03 01:44:57
-						# Structure of `json_response["data"]`:
-						# - list: List[Dict],
-						#   - Example: {"articleId":140595950,"title":"【更新】cyのMemo（20240722~）","description":"我TM自己镇楼","url":"https://caoyang.blog.csdn.net/article/details/140595950","type":1,"top":false,"forcePlan":false,"viewCount":699,"commentCount":0,"editUrl":"https://editor.csdn.net/md?articleId=140595950","postTime":"2024-07-22 23:10:48","diggCount":17,"formatTime":"2024.07.22","picList":["https://i-blog.csdnimg.cn/direct/45504ff585a942c6b21afc42b6c6f34a.jpeg"],"collectCount":16}
-						#   - articleId: int, title: str, description: str
-						#   - url: str, type: int, top: bool, viewCount: int
-						#   - commentCount: int, editUrl: str, postTime: str
-						#   - diggCount: int, formatTime: str
-						#   - picList: list[str], collectCount: int
-						# - total: Int, the number of articles published by this user
-						business_list = json_response["data"]["list"]
-						if business_list is None:
-							logging.warning("Business list is None!")
-							logging.info(f"Waiting for {self.reset_interval} seconds ...")
-							time.sleep(self.reset_interval)
-						else:
-							logging.info("Successfully get business list!")
-							break
-					except Exception as exception:
-						logging.warning(f"Error in processing business list: {exception}")
-						logging.info(f"Wait for {self.reset_interval} seconds ...")
-						time.sleep(self.reset_interval)
-				business_dict = dict()	# Index `business_list` by `article_id`
-				for data in business_list:
-					article_id = str(data["articleId"])
-					title = data["title"]
-					description = data["description"]
-					view_count = data["viewCount"]
-					comment_count = data["commentCount"]
-					digg_count = data["diggCount"]
-					collect_count = data["collectCount"]
-					business_dict[article_id] = {"title": title,
-												 "description": description,
-												 "view_count": view_count,
-												 "comment_count": comment_count,
-												 "digg_count": digg_count,
-												 "collect_count": collect_count,
-												 }
-				# Check the statistics of each `watch_article_id`
-				datetime_string = time.strftime("%Y-%m-%d %H:%M:%S")
-				for watch_article_id in watch_article_ids:
-					if watch_article_id in business_dict:
-						logging.info(f"{watch_article_id} can be watched!")
-						keys = list(business_dict[watch_article_id].keys())
-						values = list(business_dict[watch_article_id].values())
-						save_path = os.path.join(self.monitor_save_dir, f"{watch_article_id}.txt")
-						if not os.path.exists(save_path):
-							# Create file and write table headers
-							with open(save_path, 'w', encoding="utf8") as f:
-								f.write('\t'.join(keys) + "\tdatetime\n")
-						with open(save_path, 'a', encoding="utf8") as f:
-							f.write('\t'.join(map(str, values)) + f"\t{datetime_string}\n")
-					else:
-						logging.info(f"{watch_article_id} cannot be watched!")				
-				# ---------------------------------------------------------
-				# Step 3: Watch the statistics number of user profile
-				# ---------------------------------------------------------
-				statistics_numbers = list()
-				while True:
-					response = self.easy_requests(
-						method = "GET",
-						url = url_user,
-						max_trial = -1,
-						headers = headers_profile,
-						timeout = 30,
-					)
-					html = response.text
-					soup = BeautifulSoup(html, "lxml")
-					user_profile_div = soup.find("div", class_="user-profile-head-info-r-c")	# Statistics number area 1
-					achievement_box_ul = soup.find("ul", class_="aside-common-box-achievement")	# Statistics number area 1
-					if user_profile_div is None:
-						logging.warning("User profile is None!")
-						logging.info(f"Waiting for {self.reset_interval} seconds ...")
-						time.sleep(self.reset_interval)
-					elif achievement_box_ul is None:
-						logging.warning("Achievement box is None!")
-						logging.info(f"Waiting for {self.reset_interval} seconds ...")
-						time.sleep(self.reset_interval)
-					else:						
-						logging.info("Successfully find user profile and achievement box!")
-						
-						break
-				statistics_number_divs = user_profile_div.find_all("div", class_="user-profile-statistics-num")
-				achievement_number_spans = achievement_box_ul.find_all("span")
-				statistics_numbers += map(_tag_to_number, statistics_number_divs)
-				statistics_numbers += map(_tag_to_number, achievement_number_spans)
-				datetime_string = time.strftime("%Y-%m-%d %H:%M:%S")
-				save_path = os.path.join(self.monitor_save_dir, f"{username}.txt")
-				if not os.path.exists(save_path):
-					with open(save_path, 'w', encoding="utf8") as f:
-						f.write("statistics\tdatetime\n")
-				with open(save_path, 'a', encoding="utf8") as f:
-					f.write(','.join(map(str, statistics_numbers)) + f"\t{datetime_string}\n")
-				# ---------------------------------------------------------
-				# Step 4: Interval
-				# ---------------------------------------------------------
-				monitor_end_time = time.time()
-				consumed_interval = monitor_end_time - monitor_start_time
-				if consumed_interval < monitor_interval:
-					remain_interval = monitor_interval - consumed_interval
-					logging.info(f"Remain interval for {remain_interval} seconds ...")
-					time.sleep(remain_interval)
+    # Monitor and increase the view-count of articles
+    # @param domain: High level CSDN users usually have DIY domain name, e.g. my domain name is "caoyang" and corresponding home page is "https://caoyang.blog.csdn.net"
+    # @param username: CSDN username, e.g. my username is "CY19980216" and the corresponding home page is "https://blog.csdn.net/CY19980216"
+    # @param watch_article_ids: Articles which are required to be watched to monitor the view-count, default `self.watch_article_ids`
+    # @param read_article_ids: Articles which are required to be read to increase the view-count, default `self.read_article_ids`
+    # @param max_view_count: Max view-count of `read_article_ids`
+    # @param monitor_interval: Interval time between two loops
+    # @param kwargs: Other keyword arguments used to update `self.query_dict_of_api_business_list`
+    def monitor_user_data(self,
+                          domain = "caoyang",
+                          username = "CY19980216",
+                          watch_article_ids = None,
+                          read_article_ids = None,
+                          max_view_count = 10000,
+                          monitor_interval = 120,
+                          **kwargs,
+                          ):
+        def _tag_to_number(_tag):
+            _tag_string = str(_tag.string).replace(',', str())
+            if _tag_string.isdecimal():
+                return int(_tag_string)
+            else:
+                return -1
+        running_timestamp = time.strftime("%Y%m%d%H%M%S")
+        if watch_article_ids is None:
+            watch_article_ids = self.watch_article_ids[:]
+        if read_article_ids is None:
+            read_article_ids = self.read_article_ids[:]
+        if domain is None:
+            url_user = self.url_formatter_user_by_username(username=username)
+        else:
+            url_user = self.url_formatter_user_by_domain(domain=domain)
+        logging.info(f"`url_user: {url_user}")
+        url_formatter_article = urljoin(url_user, self.api_article + "{article_id}").format
+        query_dict = deepcopy(self.query_dict_of_api_business_list)
+        query_dict["username"] = username
+        for key, word in kwargs.items():
+            if key in query_dict:
+                query_dict[key] = word
+        query_string = urlencode(query_dict)
+        logging.info(f"Query string: {query_string}")
+        url_business_list = urljoin(url_user, self.api_business_list + query_string)
+        logging.info(f"`url_business_list`: {url_business_list}")
+        headers_business_list = BaseCrawler.headers_to_dict(headers=self.headers["business_list"])
+        headers_article = BaseCrawler.headers_to_dict(headers=self.headers["article"])
+        headers_profile = BaseCrawler.headers_to_dict(headers=self.headers["profile"])
+        while True:
+            monitor_start_time = time.time()
+            # ---------------------------------------------------------
+            # Step 1: Read each article to increase read-count
+            # ---------------------------------------------------------
+            if read_article_ids:	
+                for i, read_article_id in enumerate(read_article_ids):
+                    logging.info(f"Reading article {read_article_id} ...")
+                    response = self.easy_requests(
+                        method = "GET",
+                        url = url_formatter_article(article_id = read_article_id),
+                        max_trial = 5,
+                        headers = headers_article,
+                        timeout = 30,
+                    )
+                    if response is None:
+                        logging.warning(f"  - Fail to read article {read_article_id}!")
+                    else:
+                        logging.info(f"  - Successfully read article {read_article_id}!")	
+                        soup = BeautifulSoup(response.text, "lxml")
+                        read_count_span = soup.find("span", class_="read-count")
+                        read_count_string = str(read_count_span.string)
+                        read_count = int(self.regexes["number"].findall(read_count_string)[0])
+                        logging.info(f"  - Read count: {read_count_string}")
+                        if read_count >= max_view_count or 'w' in read_count_string:
+                            logging.info(f"  - {read_article_id} exceeds max view count!")
+                            read_article_ids.remove(read_article_id)
+            # ---------------------------------------------------------
+            # Step 2: Watch the statistics number of each article
+            # ---------------------------------------------------------
+            if watch_article_ids:
+                while True:
+                    # Request for `business_list`
+                    response = self.easy_requests(
+                        method = "GET",
+                        url = url_business_list,
+                        max_trial = -1,
+                        headers = headers_business_list,
+                        timeout = 30,
+                    )
+                    json_response = response.json()
+                    try:
+                        # 2024/08/03 01:44:57
+                        # Structure of `json_response["data"]`:
+                        # - list: List[Dict],
+                        #   - Example: {"articleId":140595950,"title":"【更新】cyのMemo（20240722~）","description":"我TM自己镇楼","url":"https://caoyang.blog.csdn.net/article/details/140595950","type":1,"top":false,"forcePlan":false,"viewCount":699,"commentCount":0,"editUrl":"https://editor.csdn.net/md?articleId=140595950","postTime":"2024-07-22 23:10:48","diggCount":17,"formatTime":"2024.07.22","picList":["https://i-blog.csdnimg.cn/direct/45504ff585a942c6b21afc42b6c6f34a.jpeg"],"collectCount":16}
+                        #   - articleId: int, title: str, description: str
+                        #   - url: str, type: int, top: bool, viewCount: int
+                        #   - commentCount: int, editUrl: str, postTime: str
+                        #   - diggCount: int, formatTime: str
+                        #   - picList: list[str], collectCount: int
+                        # - total: Int, the number of articles published by this user
+                        business_list = json_response["data"]["list"]
+                        if business_list is None:
+                            logging.warning("Business list is None!")
+                            logging.info(f"Waiting for {self.reset_interval} seconds ...")
+                            time.sleep(self.reset_interval)
+                        else:
+                            logging.info("Successfully get business list!")
+                            break
+                    except Exception as exception:
+                        logging.warning(f"Error in processing business list: {exception}")
+                        logging.info(f"Wait for {self.reset_interval} seconds ...")
+                        time.sleep(self.reset_interval)
+                business_dict = dict()	# Index `business_list` by `article_id`
+                for data in business_list:
+                    article_id = str(data["articleId"])
+                    title = data["title"]
+                    description = data["description"]
+                    view_count = data["viewCount"]
+                    comment_count = data["commentCount"]
+                    digg_count = data["diggCount"]
+                    collect_count = data["collectCount"]
+                    business_dict[article_id] = {"title": title,
+                                                 "description": description,
+                                                 "view_count": view_count,
+                                                 "comment_count": comment_count,
+                                                 "digg_count": digg_count,
+                                                 "collect_count": collect_count,
+                                                 }
+                # Check the statistics of each `watch_article_id`
+                datetime_string = time.strftime("%Y-%m-%d %H:%M:%S")
+                for watch_article_id in watch_article_ids:
+                    if watch_article_id in business_dict:
+                        logging.info(f"{watch_article_id} can be watched!")
+                        keys = list(business_dict[watch_article_id].keys())
+                        values = list(business_dict[watch_article_id].values())
+                        save_path = os.path.join(self.monitor_save_dir, f"{watch_article_id}.txt")
+                        if not os.path.exists(save_path):
+                            # Create file and write table headers
+                            with open(save_path, 'w', encoding="utf8") as f:
+                                f.write('\t'.join(keys) + "\tdatetime\n")
+                        with open(save_path, 'a', encoding="utf8") as f:
+                            f.write('\t'.join(map(str, values)) + f"\t{datetime_string}\n")
+                    else:
+                        logging.info(f"{watch_article_id} cannot be watched!")				
+                # ---------------------------------------------------------
+                # Step 3: Watch the statistics number of user profile
+                # ---------------------------------------------------------
+                statistics_numbers = list()
+                while True:
+                    response = self.easy_requests(
+                        method = "GET",
+                        url = url_user,
+                        max_trial = -1,
+                        headers = headers_profile,
+                        timeout = 30,
+                    )
+                    html = response.text
+                    soup = BeautifulSoup(html, "lxml")
+                    user_profile_div = soup.find("div", class_="user-profile-head-info-r-c")	# Statistics number area 1
+                    achievement_box_ul = soup.find("ul", class_="aside-common-box-achievement")	# Statistics number area 1
+                    if user_profile_div is None:
+                        logging.warning("User profile is None!")
+                        logging.info(f"Waiting for {self.reset_interval} seconds ...")
+                        time.sleep(self.reset_interval)
+                    elif achievement_box_ul is None:
+                        logging.warning("Achievement box is None!")
+                        logging.info(f"Waiting for {self.reset_interval} seconds ...")
+                        time.sleep(self.reset_interval)
+                    else:						
+                        logging.info("Successfully find user profile and achievement box!")
+                        
+                        break
+                statistics_number_divs = user_profile_div.find_all("div", class_="user-profile-statistics-num")
+                achievement_number_spans = achievement_box_ul.find_all("span")
+                statistics_numbers += map(_tag_to_number, statistics_number_divs)
+                statistics_numbers += map(_tag_to_number, achievement_number_spans)
+                datetime_string = time.strftime("%Y-%m-%d %H:%M:%S")
+                save_path = os.path.join(self.monitor_save_dir, f"{username}.txt")
+                if not os.path.exists(save_path):
+                    with open(save_path, 'w', encoding="utf8") as f:
+                        f.write("statistics\tdatetime\n")
+                with open(save_path, 'a', encoding="utf8") as f:
+                    f.write(','.join(map(str, statistics_numbers)) + f"\t{datetime_string}\n")
+                # ---------------------------------------------------------
+                # Step 4: Interval
+                # ---------------------------------------------------------
+                monitor_end_time = time.time()
+                consumed_interval = monitor_end_time - monitor_start_time
+                if consumed_interval < monitor_interval:
+                    remain_interval = monitor_interval - consumed_interval
+                    logging.info(f"Remain interval for {remain_interval} seconds ...")
+                    time.sleep(remain_interval)
+                else:
+                    monitor_interval += 50
+                    logging.info(f"Interval is too short! Increase up to {monitor_interval}")
 
-	# Display the monitor data of articles
-	# @param watch_article_ids: List of articleId which are required to be displayed, default `self.watch_article_ids`
-	# @param columns: List of columns which are required to be displayed, e.g. "title", "description", "view_count", "comment_count", "digg_count", "collect_count"
-	# @param n_days_before: The number of days before to be displayed
-	def display_watch_article_data(self,
-								   watch_article_ids = None,
-								   columns = ["view_count"],
-								   n_days_before = 3,
-								   ):
-		if watch_article_ids is None:
-			watch_article_ids = self.watch_article_ids[:]
-		datetime_now = datetime.now()
-		datetime_n_days_before = datetime.now() - timedelta(days=n_days_before)
-		dataframe_slices = {column: list() for column in columns}
-		# Display by different article and datetime
-		for watch_article_id in watch_article_ids:
-			file_path = os.path.join(self.monitor_save_dir, f"{watch_article_id}.txt")
-			dataframe = pandas.read_csv(file_path, sep='\t', header=0)
-			dataframe["datetime"] = pandas.to_datetime(dataframe["datetime"], format="%Y-%m-%d %H:%M:%S")
-			dataframe = dataframe[dataframe["datetime"] >= datetime_n_days_before]
-			latest_title = dataframe.loc[dataframe.shape[0] - 1, "title"]
-			logging.info(f"Display article {watch_article_id}: {latest_title}")
-			for column in columns:
-				dataframe_slice = dataframe[[column, "datetime", "title"]].drop_duplicates(subset=column, keep="first").reset_index(drop=True)
-				dataframe_slices[column].append(dataframe_slice)
-				if dataframe_slice.shape[0] > 1:
-					for i in range(1, dataframe_slice.shape[0]):
-						count = dataframe_slice.loc[i, column]
-						datetime_string = dataframe_slice.loc[i, "datetime"]
-						logging.info(f"    - {count} {datetime_string}")
-				else:
-					logging.info(f"    - Current `{column}` is {dataframe_slice.loc[0, column]}, no evidence inspected since {dataframe_slice.loc[0, 'datetime']}!")
-				logging.info('-' * 16)
-		logging.info('#' * 16)
-		# Display by datetime only
-		for column in columns:
-			combined_dataframe_slices = pandas.concat(dataframe_slices[column], axis=0).sort_values(by="datetime", ascending=True).reset_index(drop=True)
-			for i in range(combined_dataframe_slices.shape[0]):
-				title = combined_dataframe_slices.loc[i, "title"]
-				count = combined_dataframe_slices.loc[i, column]
-				datetime_string = combined_dataframe_slices.loc[i, "datetime"]
-				logging.info(f"    - {title} {count} {datetime_string}")
+    # Display the monitor data of articles
+    # @param watch_article_ids: List of articleId which are required to be displayed, default `self.watch_article_ids`
+    # @param columns: List of columns which are required to be displayed, e.g. "title", "description", "view_count", "comment_count", "digg_count", "collect_count"
+    # @param n_days_before: The number of days before to be displayed
+    def display_watch_article_data(self,
+                                   watch_article_ids = None,
+                                   columns = ["view_count"],
+                                   n_days_before = 3,
+                                   ):
+        if watch_article_ids is None:
+            watch_article_ids = self.watch_article_ids[:]
+        datetime_now = datetime.now()
+        datetime_n_days_before = datetime.now() - timedelta(days=n_days_before)
+        dataframe_slices = {column: list() for column in columns}
+        # Display by different article and datetime
+        for watch_article_id in watch_article_ids:
+            file_path = os.path.join(self.monitor_save_dir, f"{watch_article_id}.txt")
+            dataframe = pandas.read_csv(file_path, sep='\t', header=0)
+            dataframe["datetime"] = pandas.to_datetime(dataframe["datetime"], format="%Y-%m-%d %H:%M:%S")
+            dataframe = dataframe[dataframe["datetime"] >= datetime_n_days_before]
+            latest_title = dataframe.loc[dataframe.shape[0] - 1, "title"]
+            logging.info(f"Display article {watch_article_id}: {latest_title}")
+            for column in columns:
+                dataframe_slice = dataframe[[column, "datetime", "title"]].drop_duplicates(subset=column, keep="first").reset_index(drop=True)
+                dataframe_slices[column].append(dataframe_slice)
+                if dataframe_slice.shape[0] > 1:
+                    for i in range(1, dataframe_slice.shape[0]):
+                        count = dataframe_slice.loc[i, column]
+                        datetime_string = dataframe_slice.loc[i, "datetime"]
+                        logging.info(f"    - {count} {datetime_string}")
+                else:
+                    logging.info(f"    - Current `{column}` is {dataframe_slice.loc[0, column]}, no evidence inspected since {dataframe_slice.loc[0, 'datetime']}!")
+                logging.info('-' * 16)
+        logging.info('#' * 16)
+        # Display by datetime only
+        for column in columns:
+            combined_dataframe_slices = pandas.concat(dataframe_slices[column], axis=0).sort_values(by="datetime", ascending=True).reset_index(drop=True)
+            for i in range(combined_dataframe_slices.shape[0]):
+                title = combined_dataframe_slices.loc[i, "title"]
+                count = combined_dataframe_slices.loc[i, column]
+                datetime_string = combined_dataframe_slices.loc[i, "datetime"]
+                logging.info(f"    - {title} {count} {datetime_string}")
