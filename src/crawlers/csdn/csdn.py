@@ -86,18 +86,8 @@ sec-ch-ua-platform: \"Windows\"""",
 	}
 	watch_article_ids = []	# Default `watch_article_ids`
 	read_article_ids = [
-		"151874936", "152050815", "151968907", "148641567", "150592993",
-		"148512070", "148512070", "148659260", "148677582", "148343981",
-		"147596961", "147596875", "147936000", "147654635", "148382586",
-		"147903242", "147568082", "147513573", "147464165", "147428712",
-		"147162527", "147078723", "146883693", "143653279", "143471542",
-		"144775662", "143628401", "145690187", "144010237", "145502672",
-		"146468206", "146460808", "145088488", "146387569", "143099065",  
-		"144596444", "144651727", "144133212", "144278328", "143869819",  
-		"140899018", "142684656", "141498497", "140747915", "140621717",  
-		"143350101", "143310248", "142441347", "135325071", "141369623",  
-		"140595950", "139551143", "138088546", "137213986", "136645892",  
-		"136088465", "135319365", "134483304", "134442145", "133832711",
+		"153516648",
+		"149483511",
 		"124877401",
 	]	# Default `read_article_ids`
 
@@ -132,11 +122,12 @@ sec-ch-ua-platform: \"Windows\"""",
 				return int(_tag_string)
 			else:
 				return -1
-		running_timestamp = time.strftime("%Y%m%d%H%M%S")
 		if watch_article_ids is None:
 			watch_article_ids = self.watch_article_ids[:]
 		if read_article_ids is None:
 			read_article_ids = self.read_article_ids[:]
+		logging.info(f"watch_article_ids: {len(watch_article_ids)}")
+		logging.info(f"read_article_ids: {len(read_article_ids)}")
 		if domain is None:
 			url_user = self.url_formatter_user_by_username(username=username)
 		else:
@@ -160,7 +151,7 @@ sec-ch-ua-platform: \"Windows\"""",
 			# ---------------------------------------------------------
 			# Step 1: Read each article to increase read-count
 			# ---------------------------------------------------------
-			if read_article_ids:	
+			if read_article_ids:
 				for i, read_article_id in enumerate(read_article_ids):
 					logging.info(f"Reading article {read_article_id} ...")
 					while True:
@@ -180,7 +171,7 @@ sec-ch-ua-platform: \"Windows\"""",
 							read_count_span = soup.find("span", class_="read-count")
 							if read_count_span is not None:
 								read_count_string = str(read_count_span.string)
-								logging.info(f"  - Successfully read article {read_article_id}!")	
+								logging.info(f"  - Successfully read article {read_article_id}!")
 								read_count = int(self.regexes["number"].findall(read_count_string)[0])
 								logging.info(f"  - Read count: {read_count_string}")
 								if read_count >= max_view_count or 'w' in read_count_string:
@@ -259,58 +250,55 @@ sec-ch-ua-platform: \"Windows\"""",
 						with open(save_path, 'a', encoding="utf8") as f:
 							f.write('\t'.join(map(str, values)) + f"\t{datetime_string}\n")
 					else:
-						logging.info(f"{watch_article_id} cannot be watched!")				
-				# ---------------------------------------------------------
-				# Step 3: Watch the statistics number of user profile
-				# ---------------------------------------------------------
-				statistics_numbers = list()
-				while True:
-					response = self.easy_requests(
-						method = "GET",
-						url = url_user,
-						max_trial = -1,
-						headers = headers_profile,
-						timeout = 30,
-					)
-					html = response.text
-					soup = BeautifulSoup(html, "lxml")
-					user_profile_div = soup.find("div", class_="user-profile-head-info-r-c")	# Statistics number area 1
-					achievement_box_ul = soup.find("ul", class_="aside-common-box-achievement")	# Statistics number area 1
-					if user_profile_div is None:
-						logging.warning("User profile is None!")
-						logging.info(f"Waiting for {self.reset_interval} seconds ...")
-						time.sleep(self.reset_interval)
-					elif achievement_box_ul is None:
-						logging.warning("Achievement box is None!")
-						logging.info(f"Waiting for {self.reset_interval} seconds ...")
-						time.sleep(self.reset_interval)
-					else:						
-						logging.info("Successfully find user profile and achievement box!")
-						
-						break
-				statistics_number_divs = user_profile_div.find_all("div", class_="user-profile-statistics-num")
-				achievement_number_spans = achievement_box_ul.find_all("span")
-				statistics_numbers += map(_tag_to_number, statistics_number_divs)
-				statistics_numbers += map(_tag_to_number, achievement_number_spans)
-				datetime_string = time.strftime("%Y-%m-%d %H:%M:%S")
-				save_path = os.path.join(self.monitor_save_dir, f"{username}.txt")
-				if not os.path.exists(save_path):
-					with open(save_path, 'w', encoding="utf8") as f:
-						f.write("statistics\tdatetime\n")
-				with open(save_path, 'a', encoding="utf8") as f:
-					f.write(','.join(map(str, statistics_numbers)) + f"\t{datetime_string}\n")
-				# ---------------------------------------------------------
-				# Step 4: Interval
-				# ---------------------------------------------------------
-				monitor_end_time = time.time()
-				consumed_interval = monitor_end_time - monitor_start_time
-				if consumed_interval < monitor_interval:
-					remain_interval = monitor_interval - consumed_interval
-					logging.info(f"Remain interval for {remain_interval} seconds ...")
-					time.sleep(remain_interval)
+						logging.info(f"{watch_article_id} cannot be watched!")
+			# ---------------------------------------------------------
+			# Step 3: Watch the statistics number of user profile
+			# ---------------------------------------------------------
+			statistics_numbers = list()
+			while True:
+				response = self.easy_requests(
+					method = "GET",
+					url = url_user,
+					max_trial = -1,
+					headers = headers_profile,
+					timeout = 30,
+				)
+				html = response.text
+				soup = BeautifulSoup(html, "lxml")
+				user_profile_div = soup.find("div", class_="user-profile-head-info-r-c")	# Statistics number area 1
+				achievement_box_ul = soup.find("ul", class_="aside-common-box-achievement")	# Statistics number area 1
+				if user_profile_div is None:
+					logging.warning("User profile is None!")
+					logging.info(f"Waiting for {self.reset_interval} seconds ...")
+					time.sleep(self.reset_interval)
+				elif achievement_box_ul is None:
+					logging.warning("Achievement box is None!")
+					logging.info(f"Waiting for {self.reset_interval} seconds ...")
+					time.sleep(self.reset_interval)
 				else:
-					monitor_interval += 50
-					logging.info(f"Interval is too short! Increase up to {monitor_interval}")
+					logging.info("Successfully find user profile and achievement box!")
+
+					break
+			statistics_number_divs = user_profile_div.find_all("div", class_="user-profile-statistics-num")
+			achievement_number_spans = achievement_box_ul.find_all("span")
+			statistics_numbers += map(_tag_to_number, statistics_number_divs)
+			statistics_numbers += map(_tag_to_number, achievement_number_spans)
+			datetime_string = time.strftime("%Y-%m-%d %H:%M:%S")
+			save_path = os.path.join(self.monitor_save_dir, f"{username}.txt")
+			if not os.path.exists(save_path):
+				with open(save_path, 'w', encoding="utf8") as f:
+					f.write("statistics\tdatetime\n")
+			with open(save_path, 'a', encoding="utf8") as f:
+				f.write(','.join(map(str, statistics_numbers)) + f"\t{datetime_string}\n")
+			# ---------------------------------------------------------
+			# Step 4: Interval
+			# ---------------------------------------------------------
+			monitor_end_time = time.time()
+			consumed_interval = monitor_end_time - monitor_start_time
+			if consumed_interval < monitor_interval:
+				remain_interval = monitor_interval - consumed_interval
+				logging.info(f"Remain interval for {remain_interval} seconds ...")
+				time.sleep(remain_interval)
 
 	# Display the monitor data of articles
 	# @param watch_article_ids: List of articleId which are required to be displayed, default `self.watch_article_ids`
