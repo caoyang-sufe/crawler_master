@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # @author: caoyang
 # @email: caoyang@stu.sufe.edu.cn
+# General BiQuGe Crawler
 
 import os
 import re
