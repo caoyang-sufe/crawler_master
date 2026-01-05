@@ -24,6 +24,7 @@ from settings import CRAWLER_DATA_DIR, TEMP_DIR
 
 class Bxwxx7Crawler(BaseCrawler):
 	url_host = "https://www.bxwxx7.com/"
+	url_host = "https://www.bxsw7.com/"
 	url_summary = {
 	}
 	headers = {

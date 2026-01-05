@@ -86,9 +86,7 @@ sec-ch-ua-platform: \"Windows\"""",
 	}
 	watch_article_ids = []	# Default `watch_article_ids`
 	read_article_ids = [
-		"153516648",
-		"149483511",
-		"124877401",
+		"155207608",
 	]	# Default `read_article_ids`
 
 	def __init__(self,
@@ -103,7 +101,7 @@ sec-ch-ua-platform: \"Windows\"""",
 	# @param username: CSDN username, e.g. my username is "CY19980216" and the corresponding home page is "https://blog.csdn.net/CY19980216"
 	# @param watch_article_ids: Articles which are required to be watched to monitor the view-count, default `self.watch_article_ids`
 	# @param read_article_ids: Articles which are required to be read to increase the view-count, default `self.read_article_ids`
-	# @param max_view_count: Max view-count of `read_article_ids`
+	# @param max_view_count: Max view-count of `read_article_ids`P
 	# @param monitor_interval: Interval time between two loops
 	# @param kwargs: Other keyword arguments used to update `self.query_dict_of_api_business_list`
 	def monitor_user_data(self,
@@ -148,6 +146,7 @@ sec-ch-ua-platform: \"Windows\"""",
 		headers_profile = BaseCrawler.headers_to_dict(headers=self.headers["profile"])
 		while True:
 			monitor_start_time = time.time()
+			import iostream
 			# ---------------------------------------------------------
 			# Step 1: Read each article to increase read-count
 			# ---------------------------------------------------------

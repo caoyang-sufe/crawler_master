@@ -22,7 +22,7 @@ from src.crawlers.bqg import CRAWLER_NAME
 from settings import CRAWLER_DATA_DIR, TEMP_DIR
 
 
-class BQG128Crawler(BaseCrawler):
+class BQGCrawler(BaseCrawler):
 	url_host = "https://www.bqg128.com/"
 	headers = {
 		"chrome": """accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
@@ -57,7 +57,7 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 	def __init__(self,
 				 **kwargs,
 				 ):
-		super(BQG128Crawler, self).__init__(**kwargs)
+		super(BQGCrawler, self).__init__(**kwargs)
 		self.regexes["html_tag"] = re.compile(r"<[^>]+>|\t")	# Remove HTML tags, including '\t' only
 		self.download_dir = os.path.join(CRAWLER_DATA_DIR, CRAWLER_NAME, "download")	# Save the downloaded data
 		os.makedirs(self.download_dir, exist_ok=True)
@@ -86,10 +86,14 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 	# @return book_info: Dict[bookName[Str], meta[Str], intro[Str], count[Str]]
 	def parse_book_info(self, url = None, html = None):
 		soup = self._easy_soup(url, html)
-		div_book_info = soup.find("div", class_="book").find("div", class_="info")
-		book_name = self.regexes["html_tag"].sub(str(), str(div_book_info.find("h1")))
-		meta = self.regexes["html_tag"].sub(str(), str(div_book_info.find('p', class_="small")))
-		intro = self.regexes["html_tag"].sub(str(), str(div_book_info.find('p', class_="intro")))
+		div_book_info = soup.find("div", class_="info")
+		book_name = meta = intro = None
+		try:
+			book_name = self.regexes["html_tag"].sub(str(), str(div_book_info.find("h1")))
+			meta = self.regexes["html_tag"].sub(str(), str(div_book_info.find('div', class_="small")))
+			intro = self.regexes["html_tag"].sub(str(), str(div_book_info.find('div', class_="intro")))
+		except:
+			pass
 		return {"bookName": book_name, "meta": meta, "intro": intro}
 
 	# @param url: Book URL, e.g. https://www.bqg128.com/book/97198/
@@ -98,7 +102,8 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 	# * Note: There is no volume hierarchy and Free/VIP in BQG, so that the `book_catalog` is shallow (as to `QidianCrawler`)
 	def parse_book_catalog(self, url = None, html = None):
 		soup = self._easy_soup(url, html)
-		dd_chapters = soup.find("div", class_="listmain").find_all("dd")	# Catalog Volumes are not unique
+		# dd_chapters = soup.find("div", class_="listmain").find_all("dd")	# Catalog Volumes are not unique
+		dd_chapters = soup.find("div", class_="chapter container").find_all("li")	# Catalog Volumes are not unique
 		book_catalog = list()
 		for dd_chapter in dd_chapters:
 			# Tranverse each chapter
@@ -120,7 +125,7 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 		headers["Referer"] = url
 		html = self.easy_requests(
 			method = "GET",
-			url = urljoin(self.url_host, f"/user/geturl.html?url={url}"),
+			url = url,
 			max_trial = 5,
 			headers = BaseCrawler.headers_to_dict(headers=self.headers["chrome"]),
 			timeout = 30,
@@ -134,9 +139,11 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 		reader_content = self.regexes["html_tag"].sub(str(), reader_content)
 		return reader_content
 
-	# @param book_url: Book URL, e.g. https://www.qidian.com/book/1041884414/
+	# @param book_url: Book URL, e.g. https://www.bqg4635.cc/#/book/46745/
 	# @return book: Dict[info[@return book_info], catalog[@return book_catalog], content[List[List[Dict[title[Str], text[Str]]]]]]
 	def parse_book(self, book_url, save_dir = None, interval = 1):
+		self.url_host = '/'.join(book_url.split('/')[:3]) + '/'
+		logging.info(f"Host URL: {self.url_host}")
 		book_id = book_url.rstrip('/').split('/')[-1]
 		save_dir = self.download_dir if save_dir is None else save_dir
 		html = self.easy_requests(
@@ -158,21 +165,24 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 		logging.info(f"Book meta: {book_info['meta']}")
 		logging.info(f"Book intro: {book_info['intro']}")
 		logging.info("Parsing chapter content ...")
-		book_text = str()
+		save_name = f"{book_id}-{book_info['bookName']}"
+		save_path = os.path.join(save_dir, f"{save_name}.txt")
+		with open(save_path, 'w', encoding="utf8") as f:
+			pass
 		for i, chapter in enumerate(book_catalog):
+			buffer_text = str()
 			chapter_name = chapter["chapterName"]
 			chapter_url = chapter["chapterURL"]
-			book_text += '-' * 64 + '\n'
-			book_text += f"\n第{i + 1}章 {chapter_name}\n"
+			buffer_text += '-' * 64 + '\n'
+			buffer_text += f"\n第{i + 1}章 {chapter_name}\n"
 			logging.info(f"  {i + 1}. {chapter_name}")
 			reader_content = self.parse_reader_content(url = chapter_url)
-			book_text += f"\n{reader_content}\n"
+			buffer_text += f"\n{reader_content}\n"
 			book["content"].append({"title": chapter_name, "text": reader_content})
 			time.sleep(interval)
-		save_name = f"{book_id}-{book_info['bookName']}"
+			with open(os.path.join(save_dir, f"{save_name}.txt"), 'a', encoding="utf8") as f:
+				f.write(buffer_text)
 		with open(os.path.join(save_dir, f"{save_name}.json"), 'w', encoding="utf8") as f:
 			json.dump(book, f, ensure_ascii=False)
-		with open(os.path.join(save_dir, f"{save_name}.txt"), 'w', encoding="utf8") as f:
-			f.write(book_text)
 		return book
 
