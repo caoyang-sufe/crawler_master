@@ -126,10 +126,16 @@ def run_bqg_downloader(**kwargs):
 		# "https://www.bqg128.com/book/103683",	# dpcqzyz
 		# "https://www.bqg128.com/book/108632",	# dpcqzyz
 		# "https://www.bqg4635.cc/#/book/46745/"	# hrxyhj
-		"https://www.xbqg777.com/51963"	# hrxyhj
+		# "https://www.xbqg777.com/51963"	# hrxyhj
 		# "https://www.xbqg777.com/50716"	# hrxyhj-xx
+		# "https://www.biquge123.uk/52671",
+		# "https://www.biquge123.uk/50715",
+		# "https://www.biquge123.uk/51962",
+		# "https://www.biquge123.uk/52742",
+		# "https://www.520bqg.com/book/297285/",
+		# "https://www.bqg8140.cc/#/book/179803",
+		"https://www.bqg128.cc/book/171185/",
 	]
-	
 	for book_url in book_urls:
 		logging.info(f"Download: {book_url.rstrip('/').split('/')[-1]}")
 		book = bqg.parse_book(book_url, interval = 2)

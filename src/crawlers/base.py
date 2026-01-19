@@ -117,7 +117,7 @@ class BaseCrawler(BaseClass):
 		chrome_options.add_argument(f"user-data-dir={self.chrome_user_data_path}")	# Import user data
 		if headless:
 			chrome_options.add_argument("--headless")
-		driver = webdriver.Chrome(chrome_options=chrome_options)
+		driver = webdriver.Chrome(options=chrome_options)
 		driver.set_page_load_timeout(timeout)
 		if not headless:
 			driver.maximize_window()
@@ -138,6 +138,27 @@ class BaseCrawler(BaseClass):
 			driver.maximize_window()
 		return driver
 
+	# Get HTML by driver
+	# @param url: Target URL
+	# @param driver: Browser driver
+	# @param browser: Browser name, e.g. "chrome", "firefox"
+	# @return: Cookie string	
+	def get_page_source(self,
+						url,
+						driver = None,
+						browser = "chrome",
+						):
+		quit_flag = False
+		if driver is None:
+			# If there is no driver passed
+			quit_flag = True
+			driver = self.initialize_driver(browser=browser, headless=False, timeout=30)
+		driver.get(url)
+		page_source = driver.page_source()
+		if quit_flag:
+			driver.quit()
+		return page_source	
+	
 	# Get cookies by driver
 	# @param url: Target URL
 	# @param driver: Browser driver

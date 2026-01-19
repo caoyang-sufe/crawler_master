@@ -80,7 +80,7 @@ class QQ(object):
 		driver.find_element_by_xpath(xpath_play_button).click()			
 		windows = driver.window_handles									
 		driver.switch_to.window(windows[-1])							
-		xpath_hint = '//div[@id="divdialog_0"]'							
+		xpath_hint = '//div[@id="divdialog_0"]'
 		if driver.find_elements_by_xpath(xpath_hint): 
 			raise Exception('This song can only be played in client.')
 		while True:

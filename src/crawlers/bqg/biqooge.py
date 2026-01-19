@@ -39,6 +39,20 @@ sec-fetch-site: same-origin
 sec-fetch-user: ?1
 upgrade-insecure-requests: 1
 user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36""",
+		"chrome": """accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+accept-encoding: gzip, deflate, br, zstd
+accept-language: zh-CN,zh;q=0.9
+cache-control: max-age=0
+cookie: SITE_TOTAL_ID=0c3fca44157f896cad96f01bd2824229; Hm_lvt_2f12be9030b42d09e3e0a5de48a114d2=1767853005,1767880079; HMACCOUNT=775157CE17F9C131; Hm_lvt_405a34174b7d925aa7013663c57c4aae=1767853005,1767880079; ge_js_validator_20=1767880614@20@db13ae56fac1647e677c38bac3c0b26f; Hm_lpvt_405a34174b7d925aa7013663c57c4aae=1767880615; Hm_lpvt_2f12be9030b42d09e3e0a5de48a114d2=1767880615
+sec-ch-ua: "Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+sec-fetch-dest: document
+sec-fetch-mode: navigate
+sec-fetch-site: same-origin
+sec-fetch-user: ?1
+upgrade-insecure-requests: 1
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36""",
 		"redirect": """accept: text/html
 accept-encoding: gzip, deflate
 accept-language: zh-CN,zh;q=0.9
@@ -71,7 +85,7 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 				method = "GET",
 				url = url,
 				max_trial = 5,
-				headers = BaseCrawler.headers_to_dict(headers=self.headers["Chrome"]),
+				headers = BaseCrawler.headers_to_dict(headers=self.headers["chrome"]),
 				timeout = 30,
 			).text
 		return BeautifulSoup(html, "lxml")
@@ -103,8 +117,10 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 	# * Note: There is no volume hierarchy and Free/VIP in BQG, so that the `book_catalog` is shallow (as to `QidianCrawler`)
 	def parse_book_catalog(self, url = None, html = None):
 		soup = self._easy_soup(url, html)
-		# dd_chapters = soup.find("div", class_="listmain").find_all("dd")	# Catalog Volumes are not unique
-		dd_chapters = soup.find("div", class_="chapter container").find_all("li")	# Catalog Volumes are not unique
+		dd_chapters = soup.find("div", class_="listmain").find_all("dd")	# Catalog Volumes are not unique
+		# dd_chapters = soup.find("div", class_="chapter container").find_all("li")	# Catalog Volumes are not unique
+		# dd_chapters = soup.find("div", class_="list").find_all("li")	# Catalog Volumes are not unique
+		# dd_chapters = soup.find("ul", attrs={"class": "fix section-list"}).find_all("li")	# Catalog Volumes are not unique
 		book_catalog = list()
 		for dd_chapter in dd_chapters:
 			# Tranverse each chapter
@@ -124,21 +140,38 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 	def parse_reader_content(self, url):
 		headers = BaseCrawler.headers_to_dict(headers=self.headers["redirect"])
 		headers["Referer"] = url
-		html = self.easy_requests(
-			method = "GET",
-			url = url,
-			max_trial = 5,
-			headers = BaseCrawler.headers_to_dict(headers=self.headers["chrome"]),
-			timeout = 30,
-		).text
+		print(url)
+		url = url.replace("bqg128.cc/book/171185", "bqg8140.cc/#/book/179803")
+		print(url)
+		# html = self.easy_requests(
+			# method = "GET",
+			# url = url,
+			# max_trial = 5,
+			# headers = BaseCrawler.headers_to_dict(headers=self.headers["chrome"]),
+			# timeout = 30,
+		# ).text
+		html = self.get_page_source(
+			url,
+			driver = None,
+			browser = "chrome",
+		)
+		print(html)
 		soup = BeautifulSoup(html, "lxml")
 		reader_content = str()
 		div_reader_content = soup.find("div", id="chaptercontent")
 		if div_reader_content is None:
 			div_reader_content = soup.find("div", class_="content")
+		if div_reader_content is None:
+			div_reader_content = soup.find("article", class_="article")
+		if div_reader_content is None:
+			div_reader_content = soup.find("div", class_="word_read")
+		if div_reader_content is None:
+			print(div_reader_content)
+			input("Reader Content is None!")
 		reader_content = self.regexes["br"].sub('\n', str(div_reader_content))
 		reader_content = self.regexes["html_tag"].sub(str(), reader_content)
 		return reader_content
+		肉块，人体内脏
 
 	# @param book_url: Book URL, e.g. https://www.bqg4635.cc/#/book/46745/
 	# @return book: Dict[info[@return book_info], catalog[@return book_catalog], content[List[List[Dict[title[Str], text[Str]]]]]]
