@@ -117,16 +117,31 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 	# * Note: There is no volume hierarchy and Free/VIP in BQG, so that the `book_catalog` is shallow (as to `QidianCrawler`)
 	def parse_book_catalog(self, url = None, html = None):
 		soup = self._easy_soup(url, html)
-		dd_chapters = soup.find("div", class_="listmain").find_all("dd")	# Catalog Volumes are not unique
-		# dd_chapters = soup.find("div", class_="chapter container").find_all("li")	# Catalog Volumes are not unique
-		# dd_chapters = soup.find("div", class_="list").find_all("li")	# Catalog Volumes are not unique
-		# dd_chapters = soup.find("ul", attrs={"class": "fix section-list"}).find_all("li")	# Catalog Volumes are not unique
+		# TODO: add more possible tag path
+		catalog_possible_routines = [
+			("div", {"class": "listmain"}, "dd"),
+			("div", {"class": "fix section-list"}, "dd"),
+			("div", {"class": "chapter container"}, "li"),
+			("div", {"class": "list"}, "li"),
+			("div", {"class": "fix section-list"}, "li"),
+		]
+		# END
+		chapters = None
+		for tag_name, attrs, element_name in catalog_possible_routines:
+			dd_chapters_container = soup.find(tag_name, attrs=attrs)
+			if dd_chapters_container is None:
+				continue
+			try:
+				chapters = dd_chapters_container.find_all(element_name)
+			except:
+				continue
+		assert chapters is not None
 		book_catalog = list()
-		for dd_chapter in dd_chapters:
+		for chapter in chapters:
 			# Tranverse each chapter
-			a_chapter = dd_chapter.find('a')
-			chapter_name = self.regexes["html_tag"].sub(str(), str(a_chapter))
-			chapter_url = self._process_chapter_href(a_chapter.attrs["href"])
+			chapter_link = chapter.find('a')
+			chapter_name = self.regexes["html_tag"].sub(str(), str(chapter_link))
+			chapter_url = self._process_chapter_href(chapter_link.attrs["href"])
 			if chapter_url is not None:
 				book_catalog.append({"chapterName": chapter_name, "chapterURL": chapter_url})
 		return book_catalog
@@ -140,24 +155,16 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 	def parse_reader_content(self, url):
 		headers = BaseCrawler.headers_to_dict(headers=self.headers["redirect"])
 		headers["Referer"] = url
-		print(url)
-		url = url.replace("bqg128.cc/book/171185", "bqg8140.cc/#/book/179803")
-		print(url)
-		# html = self.easy_requests(
-			# method = "GET",
-			# url = url,
-			# max_trial = 5,
-			# headers = BaseCrawler.headers_to_dict(headers=self.headers["chrome"]),
-			# timeout = 30,
-		# ).text
-		html = self.get_page_source(
-			url,
-			driver = None,
-			browser = "chrome",
-		)
-		print(html)
+		html = self.easy_requests(
+			method = "GET",
+			url = url,
+			max_trial = 5,
+			headers = BaseCrawler.headers_to_dict(headers=self.headers["chrome"]),
+			timeout = 30,
+		).text
 		soup = BeautifulSoup(html, "lxml")
 		reader_content = str()
+		# TODO: add more tag path
 		div_reader_content = soup.find("div", id="chaptercontent")
 		if div_reader_content is None:
 			div_reader_content = soup.find("div", class_="content")
@@ -168,10 +175,10 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 		if div_reader_content is None:
 			print(div_reader_content)
 			input("Reader Content is None!")
+		# END
 		reader_content = self.regexes["br"].sub('\n', str(div_reader_content))
 		reader_content = self.regexes["html_tag"].sub(str(), reader_content)
 		return reader_content
-		肉块，人体内脏
 
 	# @param book_url: Book URL, e.g. https://www.bqg4635.cc/#/book/46745/
 	# @return book: Dict[info[@return book_info], catalog[@return book_catalog], content[List[List[Dict[title[Str], text[Str]]]]]]

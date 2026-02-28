@@ -107,8 +107,9 @@ def run_bilibili_downloader(**kwargs):
 	# bbc.download(bvid = "BV11g411A7zx")	# Accessible
 	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep399420")	# Accessible
 	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep247270")	# Accessible
-	bbc.easy_download(url = "https://www.bilibili.com/video/BV17BErzVENP")	# Accessible
-
+	# bbc.easy_download(url = "https://www.bilibili.com/video/BV1XbbQzxEAP")	# Accessible
+	bbc.easy_download(url = "https://www.bilibili.com/video/BV1SW411j7ko")	# Accessible
+	
 def run_qidian_downloader(**kwargs):
 	time_string = time.strftime("%Y%m%d%H%M%S")
 	logger = initialize_logger(f"./logging/qidian_downloader_{time_string}.log")
@@ -134,7 +135,9 @@ def run_bqg_downloader(**kwargs):
 		# "https://www.biquge123.uk/52742",
 		# "https://www.520bqg.com/book/297285/",
 		# "https://www.bqg8140.cc/#/book/179803",
-		"https://www.bqg128.cc/book/171185/",
+		# "https://www.bqg128.cc/book/171185/",
+		"https://www.bqg128.cc/book/137825/",
+		# "https://www.bqg8190.xyz/#/book/138400/",
 	]
 	for book_url in book_urls:
 		logging.info(f"Download: {book_url.rstrip('/').split('/')[-1]}")
@@ -159,7 +162,7 @@ def run_bqg_top_downloader():
 			book_url = urljoin(bqg.url_host, book["bookURL"])
 			logging.info(f"Download {book_name}: {book_url.rstrip('/').split('/')[-1]}")
 			book = bqg.parse_book(book_url, interval = 2)
-	terminate_logger(logger)	
+	terminate_logger(logger)
 
 def run_bixia_downloader(**kwargs):
 	time_string = time.strftime("%Y%m%d%H%M%S")
@@ -174,7 +177,7 @@ def run_bixia_downloader(**kwargs):
 		logging.info(f"Download: {book_url.rstrip('/').split('/')[-1]}")
 		book = bixia.parse_book(book_url, interval = 2)
 	terminate_logger(logger)	
-	
+
 def run_77shu_downloader(**kwargs):
 	time_string = time.strftime("%Y%m%d%H%M%S")
 	logger = initialize_logger(f"./logging/77shu_downloader_{time_string}.log")
@@ -198,9 +201,9 @@ def run_netease_download(**kwargs):
 if __name__ == "__main__":
 	# easy_run()	# bash script trigger
 	# run_aclanthology_downloader()
-	# run_bilibili_downloader()
+	run_bilibili_downloader()
 	# run_qidian_downloader()
-	run_bqg_downloader()
+	# run_bqg_downloader()
 	# run_bqg_top_downloader()
 	# run_bixia_downloader()
 	# run_77shu_downloader()
