@@ -32,12 +32,12 @@ action = ActionChains(driver)
 driver.get("https://www.bilibili.com")
 svg_buttons = driver.find_elements(By.XPATH, './/svg[@class="bili-video-card__info--no-interest--icon"]')
 dot_3_buttons = driver.find_elements(By.XPATH, './/div[@class="bili-video-card__info--right"]')
-for button in dot_3_buttons:
+for button in dot_3_buttons[:6]:
 	print(button)
 	action.move_to_element_with_offset(button, 115, -30).pause(2).click().perform()	# Size: 240 × 65
 	time.sleep(2)
 	block_up_buttons = driver.find_elements(By.XPATH, './/div[@class="bili-video-card__info--no-interest-panel--item"]')	# Find two elements: 内容不感兴趣, 不想看此UP主
 	print(block_up_buttons)
 	action.move_to_element(block_up_buttons[0]).pause(1).click().perform()	
-	time.sleep(5)
+	time.sleep(2)
 driver.quit()

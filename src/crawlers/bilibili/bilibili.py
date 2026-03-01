@@ -96,7 +96,7 @@ Connection: keep-alive""",	# Common headers for requests
 		os.makedirs(self.download_dir, exist_ok=True)
 		# Add regular expressions to BaseCrawler.regexes
 		self.regexes["episode_name"] = re.compile(r"meta name=\"keywords\" content=\"(.*?)\"")
-		self.regexes["initial_state"] = re.compile(r"<script>window.__INITIAL_STATE__=(.*?);")
+		self.regexes["initial_state"] = re.compile(r"<script>window.__INITIAL_STATE__=(.*?});")
 		self.regexes["playurl_ssr_data"] = re.compile(r"const playurlSSRData = (.*?)</script>")	# This contains data like playinfo
 		self.regexes["playinfo"] = re.compile(r"<script>window.*?__playinfo__=(.*?)</script>")	# This is playinfo
 		self.regexes["bvid"] = re.compile(r"\"bvid\":\"(.*?)\",")	# Simply find bvid on page source
@@ -452,6 +452,7 @@ Connection: keep-alive""",	# Common headers for requests
 				audio_save_path = os.path.join(self.download_dir, f"{bvid}.mp3"),
 			)
 			return 0
+		print(initial_states[0])
 		initial_state = json.loads(initial_states[0])
 		episode_list = initial_state.get("epList")
 		if episode_list is not None:

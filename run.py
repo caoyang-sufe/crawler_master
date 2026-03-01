@@ -108,7 +108,7 @@ def run_bilibili_downloader(**kwargs):
 	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep399420")	# Accessible
 	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep247270")	# Accessible
 	# bbc.easy_download(url = "https://www.bilibili.com/video/BV1XbbQzxEAP")	# Accessible
-	bbc.easy_download(url = "https://www.bilibili.com/video/BV1SW411j7ko")	# Accessible
+	bbc.easy_download(url = "https://www.bilibili.com/video/BV1JP411H7ib")	# Accessible
 	
 def run_qidian_downloader(**kwargs):
 	time_string = time.strftime("%Y%m%d%H%M%S")
