@@ -107,14 +107,13 @@ def run_bilibili_downloader(**kwargs):
 	# bbc.download(bvid = "BV11g411A7zx")	# Accessible
 	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep399420")	# Accessible
 	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep247270")	# Accessible
-	# bbc.easy_download(url = "https://www.bilibili.com/video/BV1XbbQzxEAP")	# Accessible
-	bbc.easy_download(url = "https://www.bilibili.com/video/BV1JP411H7ib")	# Accessible
+	bbc.easy_download(url = "https://www.bilibili.com/video/BV1mC411a7JH")	# Accessible
 	
 def run_qidian_downloader(**kwargs):
 	time_string = time.strftime("%Y%m%d%H%M%S")
 	logger = initialize_logger(f"./logging/qidian_downloader_{time_string}.log")
 	qdc = QidianCrawler()
-	book_url = "https://www.qidian.com/book/1042107497/"
+	book_url = "https://www.qidian.com/book/1042107497/"# bbc.easy_download(url = "https://www.bilibili.com/video/BV1XbbQzxEAP")	# Accessib
 	book = qdc.parse_book(book_url)
 	terminate_logger(logger)
 
@@ -188,7 +187,7 @@ def run_77shu_downloader(**kwargs):
 	for book_url in book_urls:
 		logging.info(f"Download: {book_url.rstrip('/').split('/')[-1]}")
 		book = shu77.parse_book(book_url, interval = 2)
-	terminate_logger(logger)	
+	terminate_logger(logger)
 
 def run_kuwo_downloader(**kwargs):
 	kuwo = KuwoCrawler()
@@ -209,3 +208,4 @@ if __name__ == "__main__":
 	# run_77shu_downloader()
 	# run_kuwo_downloader()
 	# run_netease_download()
+	

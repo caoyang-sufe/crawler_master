@@ -35,6 +35,7 @@ class BilibiliCrawler(BaseCrawler):
 	}
 	chunk_size = 1024
 	cookies = """buvid3=679FD60F-3568-EFB7-A37A-6471A719397142096infoc; b_nut=1734990842; b_lsid=AA71DCFC_193F5834CFE; _uuid=10F3AE94F-E745-6E7F-D10E1-3A6102B19D7BE43139infoc; CURRENT_FNVAL=4048; buvid4=3EBFCAB8-C4C2-DFE7-029C-85ED50DF58A143096-024122321-WbHe0fz6uHGjBc44KujX9A%3D%3D; buvid_fp=81c4cd30d2ae76951bd9bc4a97bf0697; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzUyNTAwNDIsImlhdCI6MTczNDk5MDc4MiwicGx0IjotMX0.Tuhlbbvhqa0g_ZG6AJXdzqkFXtNmv2FYP7WVbNLzFDU; bili_ticket_expires=1735249982; sid=f0dnvwgv; rpdid=|(k|kYYRm|Ym0J'u~JRmm|)RR"""
+	cookies = """buvid3=58B01054-6C59-3158-3BE5-554BFE2C71E191416infoc; b_nut=1774351791; _uuid=56CE5376-6CDD-A32B-BC10D-86C27362CABB93145infoc; buvid_fp=44d76ec2106154ef14d3f60179d00b46; buvid4=FDC1AB29-0EBF-5A24-58F1-2D5EE09B565F92351-026032419-tFVNrD/godYN8Sj7WfeU+w%3D%3D; SESSDATA=7a27f490%2C1789903860%2C41868%2A32CjDeWD9IEZi4WPURhQnBY17_sK5EGe7ECtdSvucQMW9qvv43Svnx6_eIwF3m-9hwoWcSVmpLMTR2T1N6NkU0LWFjNXBsdHlhNHZOWktnSzl3WmdaeEhtZGc1RUJEUThXMDZ3ZzMteUxjbTFiUGpBS0xBeURLTVFfTW5xUXd5Mnh3SVJ2dWdvNkxRIIEC; bili_jct=dcaa816df387be4add580e41d7bef9a4; DedeUserID=130321232; DedeUserID__ckMd5=42d02c72aa29553d; theme-tip-show=SHOWED; theme-avatar-tip-show=SHOWED; theme-switch-show=SHOWED; theme_style=dark; hit-dyn-v2=1; rpdid=|(k|)lJ)muYR0J'u~~RJYRuY); LIVE_BUVID=AUTO9317744497954962; CURRENT_QUALITY=116; PVID=1; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODA2NzQ1NTcsImlhdCI6MTc4MDQxNTI5NywicGx0IjotMX0.SZGCY87lxGGRo0JqfMQvhjW2WzO9GM-hwqG4-tdFAWI; bili_ticket_expires=1780674497; bp_t_offset_130321232=1209691484677210112; bmg_af_switch=1; bmg_src_def_domain=i0.hdslb.com; bmg_af_sc={"none":{"on":1,"def":"i0.hdslb.com"},"sgp":{"on":1,"def":"i0-sgp.hdslb.com"}}; home_feed_column=5; browser_resolution=1536-695; sid=6s1s6hff; CURRENT_FNVAL=4048; b_lsid=5F41D0FE_19E8DF3EB7C"""
 	headers = {
 		"pagelist": """Host: api.bilibili.com
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0
@@ -152,7 +153,6 @@ Connection: keep-alive""",	# Common headers for requests
 					return durlinfo[key]
 			logging.warning(f"Nothing found by {priority}")
 			return None
-				
 		elif source == "dash":
 			if priority is None:
 				priority = ["backupUrl", "backup_url", "baseUrl", "base_url"]
@@ -419,14 +419,106 @@ Connection: keep-alive""",	# Common headers for requests
 			logging.info(f"No playinfo found in bvid {bvid}, try playURLSSRData ...")
 			# 2024/12/28 02:25:42If there is no `initial_states`, then we find playurlSSRData
 			playurl_ssr_data = BilibiliCrawler._find_playurl_ssr_data(page_source = page_html)
-
 			self._download_episode_by_dash(
 				bvid = bvid,
 				playurl_ssr_data = playurl_ssr_data,
 				video_save_path = video_save_path,
 				audio_save_path = audio_save_path,
 			)
+	
+	
+	# ========== Update @20260603 By deepseek ==========
+	# - Currently, `window.__playinfo__` no longer appear in page source of `url_summary["video_page"]`, 
+	# - However, `window.__playinfo__` is still available in terminal console
+	def download(self, 
+				 bvid,
+				 save_path=None,
+				 video_save_path=None, 
+				 audio_save_path=None,
+				 ):
+		if save_path is None:
+			save_path = os.path.join(self.download_dir, f"{bvid}.mp4")
+		if video_save_path is None:
+			video_save_path = os.path.join(self.download_dir, f"{bvid}.m4s")
+		if audio_save_path is None:
+			audio_save_path = os.path.join(self.download_dir, f"{bvid}.mp3")
 		
+		# Find playinfo
+		page_html = self.easy_requests(
+			method="GET",
+			url=self.url_summary["video_page"](bvid=bvid),
+			max_trial=5,
+			headers=BaseCrawler.headers_to_dict(headers=self.headers["page"]),
+			timeout=30,
+		).text
+		playinfos = self.regexes["playinfo"].findall(page_html, re.S)
+		if playinfos:
+			playinfo = json.loads(playinfos[0])
+			# Find playurl
+			if "durl" in playinfo["data"]:
+				logging.info("Download by durl from page...")
+				self._download_by_durl(
+					durlinfo=playinfo["data"]["durl"][0],
+					save_path=save_path,
+					priority=["url", "backup_url"],
+				)
+			elif "dash" in playinfo["data"]:
+				self._download_video_by_dash(
+					bvid=bvid,
+					playinfo=playinfo,
+					video_save_path=video_save_path,
+					audio_save_path=audio_save_path,
+				)
+			else:
+				raise Exception(f"No data found in playinfo\n{playinfo}")
+			return
+		
+		# ========== Update: Get cid from `__INITIAL_STATE__` ==========
+		initial_states = self.regexes["initial_state"].findall(page_html, re.S)
+		if initial_states:
+			initial_state = json.loads(initial_states[0])
+			cid = initial_state.get("cid")
+			if cid:
+				logging.info(f"No playinfo in page, using API with cid={cid}")
+				# Get playUrl
+				playurl_json = self.easy_requests(
+					method="GET",
+					url=self.url_summary["video_playurl"](cid=cid, bvid=bvid),
+					max_trial=5,
+					headers=BaseCrawler.headers_to_dict(headers=self.headers["playurl"]),
+					timeout=30,
+				).json()
+				if playurl_json.get("code") != 0:
+					raise Exception(f"API error: {playurl_json.get('message')}")
+				
+				data = playurl_json["data"]
+				if "durl" in data:
+					logging.info("Download by durl from API...")
+					self._download_by_durl(
+						durlinfo=data["durl"][0],
+						save_path=save_path,
+						priority=["url", "backup_url"],
+					)
+				elif "dash" in data:
+					logging.info("Download by dash from API...")
+					self._download_video_by_dash(
+						bvid=bvid,
+						playinfo=playurl_json,
+						video_save_path=video_save_path,
+						audio_save_path=audio_save_path,
+					)
+				return
+		
+		# Finally request for playurlSSRData (old method)
+		logging.info(f"No playinfo and no __INITIAL_STATE__, trying playURLSSRData...")
+		playurl_ssr_data = BilibiliCrawler._find_playurl_ssr_data(page_source=page_html)
+		self._download_episode_by_dash(
+			bvid=bvid,
+			playurl_ssr_data=playurl_ssr_data,
+			video_save_path=video_save_path,
+			audio_save_path=audio_save_path,
+		)
+
 	# Download with page URL
 	# e.g.
 	# >>> url = "https://www.bilibili.com/video/BV1jf4y1h73r"
@@ -452,7 +544,6 @@ Connection: keep-alive""",	# Common headers for requests
 				audio_save_path = os.path.join(self.download_dir, f"{bvid}.mp3"),
 			)
 			return 0
-		print(initial_states[0])
 		initial_state = json.loads(initial_states[0])
 		episode_list = initial_state.get("epList")
 		if episode_list is not None:
