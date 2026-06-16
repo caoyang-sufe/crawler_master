@@ -107,7 +107,7 @@ def run_bilibili_downloader(**kwargs):
 	# bbc.download(bvid = "BV11g411A7zx")	# Accessible
 	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep399420")	# Accessible
 	# bbc.easy_download(url = "https://www.bilibili.com/bangumi/play/ep247270")	# Accessible
-	bbc.easy_download(url = "https://www.bilibili.com/video/BV1mC411a7JH")	# Accessible
+	bbc.easy_download(url = "https://www.bilibili.com/video/BV1h14y177Cx")	# Accessible
 	
 def run_qidian_downloader(**kwargs):
 	time_string = time.strftime("%Y%m%d%H%M%S")
@@ -170,7 +170,8 @@ def run_bixia_downloader(**kwargs):
 	book_urls = [
 		# "https://www.bxsw7.com/article/1876/",
 		# "https://www.bxsw7.com/article/125702/",
-		"https://www.bxsw7.com/article/226682/",
+		# "https://www.bxsw7.com/article/226682/",
+		"https://www.bxsw7.com/article/279237/",
 	]
 	for book_url in book_urls:
 		logging.info(f"Download: {book_url.rstrip('/').split('/')[-1]}")
@@ -200,11 +201,11 @@ def run_netease_download(**kwargs):
 if __name__ == "__main__":
 	# easy_run()	# bash script trigger
 	# run_aclanthology_downloader()
-	run_bilibili_downloader()
+	# run_bilibili_downloader()
 	# run_qidian_downloader()
 	# run_bqg_downloader()
 	# run_bqg_top_downloader()
-	# run_bixia_downloader()
+	run_bixia_downloader()
 	# run_77shu_downloader()
 	# run_kuwo_downloader()
 	# run_netease_download()

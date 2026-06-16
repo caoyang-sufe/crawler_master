@@ -6,6 +6,7 @@ import os
 import re
 import time
 import json
+import base64
 import random
 import pandas
 import logging
@@ -121,10 +122,23 @@ user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 			div_reader_content = soup.find("div", id="booktxt")
 			if div_reader_content is None:
 				div_reader_content = soup.find("div", id="chaptercontent")
-			page_content = self.regexes["br"].sub('\n', str(div_reader_content))
+			div_reader_content = str(div_reader_content)
+			# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+			# 2026/06/16 16:17:27
+			# Check if reader content is encrypted by base64?
+			# e.g. document.getElementById('chaptercontent').innerHTML = str_decode('PHA+...
+			entrypt_flag = div_reader_content.find("str_decode('")
+			if entrypt_flag != -1:
+				start_index = div_reader_content.find("('", entrypt_flag)
+				end_index = div_reader_content.find("')", start_index)
+				entrypted_string = div_reader_content[start_index + 2: end_index]
+				div_reader_content = base64.b64decode(entrypted_string).decode("utf-8")
+			# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+			page_content = self.regexes["br"].sub('\n', div_reader_content)
 			page_content = self.regexes["p_tag"].sub('\n', page_content)
 			page_content = self.regexes["html_tag"].sub(str(), page_content)
 			reader_content += page_content + '\n' * 2
+			print(reader_content)
 			if next_page_flag:
 				next_page_url = next_page_tag.attrs["href"]
 			else:
